@@ -1,12 +1,16 @@
 name: forum_app
 description: A new Flutter project.
-publish_to: 'none'
+publish_to: "none"
 version: 0.1.0
 
 environment:
-  sdk: '>=2.19.5 <3.0.0'
+  sdk: ">=2.19.5 <3.0.0"
 
 dependencies:
+  cloud_firestore: ^4.8.1
+  firebase_auth: ^4.6.3
+  firebase_core: ^2.14.0
+  flutter_form_builder: ^7.0.0
   flutter:
     sdk: flutter
 
