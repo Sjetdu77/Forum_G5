@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "416214302902",
+    "project_id": "forumg5",
+    "storage_bucket": "forumg5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:416214302902:android:abede4f2f879505e82e617",
+        "android_client_info": {
+          "package_name": "com.example.flutter_forum"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "416214302902-tftsil69801agkd64f71u5o0jbsevdo8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBuaSg2y_PK9yGTlvkh150OqJWiwX8P_l4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "416214302902-tftsil69801agkd64f71u5o0jbsevdo8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
