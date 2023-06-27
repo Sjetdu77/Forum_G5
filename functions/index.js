@@ -21,7 +21,7 @@ exports.onCreateUser = functions.auth.user().onCreate((user) => {
     displayName: user.displayName,
   })
       .then(() => {
-        console.log("Utilisateur enregistré dans Firestore avec succès");
+        console.log('Utilisateur enregistré dans Firestore avec succès');
         return null;
       })
       .catch((error) => {
