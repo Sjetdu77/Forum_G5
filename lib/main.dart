@@ -22,25 +22,12 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: StreamBuilder<User?>(
-        stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (BuildContext context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator(); // Afficher un indicateur de chargement pendant la vérification de l'état d'authentification.
-          } else {
-            if (snapshot.hasData && snapshot.data != null) {
-              return HomePage(); // Utilisateur connecté, afficher la page d'accueil.
-            } else {
-              return LoginPage(); // Utilisateur non connecté, afficher la page de connexion.
-            }
-          }
-        },
-      ),
+      initialRoute: '/',
       routes: {
-        '/login': (context) =>
-            LoginPage(), // Définir une route nommée pour la page de connexion.
-        '/register': (context) =>
-            RegisterPage(), // Définir une route nommée pour la page d'inscription.
+        '/': (context) =>
+            HomePage(), // Définir la route par défaut comme la `HomePage`.
+        '/login': (context) => LoginPage(),
+        '/register': (context) => RegisterPage(),
       },
     );
   }

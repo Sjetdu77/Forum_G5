@@ -1,40 +1,77 @@
 {
   "project_info": {
-    "project_number": "823475181285",
-    "project_id": "forum-app-g5",
-    "storage_bucket": "forum-app-g5.appspot.com"
+    "project_number": "416214302902",
+    "firebase_url": "https://forumg5-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "forumg5",
+    "storage_bucket": "forumg5.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:823475181285:android:1a85bc87893934d4e7260c",
+        "mobilesdk_app_id": "1:416214302902:android:abede4f2f879505e82e617",
         "android_client_info": {
-          "package_name": "com.example.forum_app"
+          "package_name": "com.example.flutter_forum"
         }
       },
       "oauth_client": [
         {
-          "client_id": "823475181285-8p27ijcl3a6feuu0tmc9q5cs7bp8q15a.apps.googleusercontent.com",
+          "client_id": "416214302902-tftsil69801agkd64f71u5o0jbsevdo8.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAvp1nbvrVKGD1OgyQmGortKdgy_kolENM"
+          "current_key": "AIzaSyBuaSg2y_PK9yGTlvkh150OqJWiwX8P_l4"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "823475181285-8p27ijcl3a6feuu0tmc9q5cs7bp8q15a.apps.googleusercontent.com",
+              "client_id": "416214302902-tftsil69801agkd64f71u5o0jbsevdo8.apps.googleusercontent.com",
               "client_type": 3
             },
             {
-              "client_id": "823475181285-r91epiv349688bq40cnb5ldhe6lhd97v.apps.googleusercontent.com",
+              "client_id": "416214302902-vpokjegekerssbsj2e0s84cp6h71avsi.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.example.forumApp"
+                "bundle_id": "com.example.flutterForum"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:416214302902:android:b116f5af9faa18ea82e617",
+        "android_client_info": {
+          "package_name": "com.example.forum_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "416214302902-tftsil69801agkd64f71u5o0jbsevdo8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBuaSg2y_PK9yGTlvkh150OqJWiwX8P_l4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "416214302902-tftsil69801agkd64f71u5o0jbsevdo8.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "416214302902-vpokjegekerssbsj2e0s84cp6h71avsi.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.flutterForum"
               }
             }
           ]

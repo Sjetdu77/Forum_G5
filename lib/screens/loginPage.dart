@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
-import 'registerPage.dart';
+import '../HomePage.dart';
+import 'RegisterPage.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -41,6 +41,10 @@ class _LoginPageState extends State<LoginPage> {
               child: Text('Login'),
             ),
             SizedBox(height: 16),
+            Text(
+              _errorMessage,
+              style: TextStyle(color: Colors.red),
+            ),
             TextButton(
               onPressed: () {
                 Navigator.push(
@@ -48,12 +52,10 @@ class _LoginPageState extends State<LoginPage> {
                   MaterialPageRoute(builder: (context) => RegisterPage()),
                 );
               },
-              child: Text('Create an account'),
-            ),
-            SizedBox(height: 16),
-            Text(
-              _errorMessage,
-              style: TextStyle(color: Colors.red),
+              child: Text(
+                "S'enregistrer",
+                style: TextStyle(color: Colors.blue),
+              ),
             ),
           ],
         ),
@@ -68,17 +70,17 @@ class _LoginPageState extends State<LoginPage> {
         email: _emailController.text,
         password: _passwordController.text,
       );
-      // Utilisez `userCredential` pour accéder aux informations de l'utilisateur connecté.
       print('Utilisateur connecté: ${userCredential.user}');
-      setState(() {
-        _errorMessage =
-            ''; // Réinitialiser le message d'erreur s'il y en avait un précédemment.
-      });
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => HomePage()),
+      );
     } catch (e) {
       print('Erreur de connexion: $e');
       setState(() {
         _errorMessage =
-            'Erreur de connexion. Veuillez vérifier vos identifiants.'; // Afficher le message d'erreur.
+            'Erreur de connexion. Veuillez vérifier vos identifiants.';
       });
     }
   }

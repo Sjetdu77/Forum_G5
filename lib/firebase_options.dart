@@ -44,39 +44,44 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyDVQCor0ZkUjtholqADTrxqNPK4rycOw0M',
-    appId: '1:823475181285:web:6e8f68ab2fddf436e7260c',
-    messagingSenderId: '823475181285',
-    projectId: 'forum-app-g5',
-    authDomain: 'forum-app-g5.firebaseapp.com',
-    storageBucket: 'forum-app-g5.appspot.com',
+    apiKey: 'AIzaSyDJAK5EX0VTmrURtghTcZiMqps_BuH0tak',
+    appId: '1:416214302902:web:1d9db68bc4b2531482e617',
+    messagingSenderId: '416214302902',
+    projectId: 'forumg5',
+    authDomain: 'forumg5.firebaseapp.com',
+    databaseURL: 'https://forumg5-default-rtdb.europe-west1.firebasedatabase.app',
+    storageBucket: 'forumg5.appspot.com',
+    measurementId: 'G-WJYJXNSN33',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAvp1nbvrVKGD1OgyQmGortKdgy_kolENM',
-    appId: '1:823475181285:android:1a85bc87893934d4e7260c',
-    messagingSenderId: '823475181285',
-    projectId: 'forum-app-g5',
-    storageBucket: 'forum-app-g5.appspot.com',
+    apiKey: 'AIzaSyBuaSg2y_PK9yGTlvkh150OqJWiwX8P_l4',
+    appId: '1:416214302902:android:b116f5af9faa18ea82e617',
+    messagingSenderId: '416214302902',
+    projectId: 'forumg5',
+    databaseURL: 'https://forumg5-default-rtdb.europe-west1.firebasedatabase.app',
+    storageBucket: 'forumg5.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyCST9avQ11jhN7K2b1ORhYeh7Ep3WPnStE',
-    appId: '1:823475181285:ios:d36c06969488eb42e7260c',
-    messagingSenderId: '823475181285',
-    projectId: 'forum-app-g5',
-    storageBucket: 'forum-app-g5.appspot.com',
-    iosClientId: '823475181285-r91epiv349688bq40cnb5ldhe6lhd97v.apps.googleusercontent.com',
+    apiKey: 'AIzaSyCXW43HU-u_7EgrkkCOW6w31xjTdLQ_LMs',
+    appId: '1:416214302902:ios:e71de1df61f5c0ba82e617',
+    messagingSenderId: '416214302902',
+    projectId: 'forumg5',
+    databaseURL: 'https://forumg5-default-rtdb.europe-west1.firebasedatabase.app',
+    storageBucket: 'forumg5.appspot.com',
+    iosClientId: '416214302902-h35vh6v9t3hk7h3ijn9g87lpuq6ukml7.apps.googleusercontent.com',
     iosBundleId: 'com.example.forumApp',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyCST9avQ11jhN7K2b1ORhYeh7Ep3WPnStE',
-    appId: '1:823475181285:ios:d36c06969488eb42e7260c',
-    messagingSenderId: '823475181285',
-    projectId: 'forum-app-g5',
-    storageBucket: 'forum-app-g5.appspot.com',
-    iosClientId: '823475181285-r91epiv349688bq40cnb5ldhe6lhd97v.apps.googleusercontent.com',
+    apiKey: 'AIzaSyCXW43HU-u_7EgrkkCOW6w31xjTdLQ_LMs',
+    appId: '1:416214302902:ios:e71de1df61f5c0ba82e617',
+    messagingSenderId: '416214302902',
+    projectId: 'forumg5',
+    databaseURL: 'https://forumg5-default-rtdb.europe-west1.firebasedatabase.app',
+    storageBucket: 'forumg5.appspot.com',
+    iosClientId: '416214302902-h35vh6v9t3hk7h3ijn9g87lpuq6ukml7.apps.googleusercontent.com',
     iosBundleId: 'com.example.forumApp',
   );
 }
