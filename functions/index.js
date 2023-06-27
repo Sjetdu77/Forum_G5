@@ -32,10 +32,12 @@ exports.onCreateUser = functions.auth.user().onCreate((user) => {
 });
 exports.addMessage = functions.https.onRequest(async (req, res) => {
   const content = req.query.text;
-  const writeMessage = getFirestore().collection('Messages')
+  const userId = req.query.userId;
+  const writeMessage = getFirestore().collection('Message')
     .add({
       content,
       dateCreation: Date.now(),
+      userId
     });
 
   res.json({result: `Message with ID: ${writeMessage.id} added.`});
