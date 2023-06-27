@@ -11,6 +11,7 @@ class Post {
     required this.userId,
     required this.content,
     required this.dateCreated,
-    required this.likes,
-  });
+  }) {
+    this.dateCreated = DateTime.timestamp();
+  }
 }
