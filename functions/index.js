@@ -1,4 +1,5 @@
 const admin = require("firebase-admin");
+const {getFirestore} = require("firebase-admin/firestore")
 admin.initializeApp();
 
 const db = admin.firestore();
@@ -28,4 +29,14 @@ exports.onCreateUser = functions.auth.user().onCreate((user) => {
         console.error("Erreur enregistrement dans Firestore:", error);
         return null;
       });
+});
+exports.addMessage = functions.https.onRequest(async (req, res) => {
+  const content = req.query.text;
+  const writeMessage = getFirestore().collection('Messages')
+    .add({
+      content,
+      dateCreation: Date.now(),
+    });
+
+  res.json({result: `Message with ID: ${writeMessage.id} added.`});
 });
