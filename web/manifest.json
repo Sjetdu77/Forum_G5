@@ -1,6 +1,6 @@
 {
-    "name": "forum_app",
-    "short_name": "forum_app",
+    "name": "flutter_forum",
+    "short_name": "flutter_forum",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
