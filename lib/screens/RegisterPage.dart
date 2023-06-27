@@ -91,44 +91,38 @@ class _RegisterPageState extends State<RegisterPage> {
         password: _passwordController.text,
       );
 
-      //print('TEST ' + userCredential.user!.uid);
-
       // Mettre à jour le nom d'affichage de l'utilisateur avec la valeur du contrôleur
       await userCredential.user!.updateDisplayName(_usernameController.text);
 
       // Recharger l'utilisateur pour obtenir les dernières informations depuis Firebase
       await userCredential.user!.reload();
 
-      // Obtenir l'utilisateur avec les informations mises à jour
-      print('Utilisateur mis à jour: ${userCredential.user!.displayName}');
+      // Introduire un délai de 2 secondes
+      await Future.delayed(Duration(seconds: 2));
 
-      // Utiliser une transaction pour enregistrer les données dans Firestore
-      await FirebaseFirestore.instance.runTransaction((transaction) async {
-        DocumentReference userRef = FirebaseFirestore.instance
-            .collection('users')
-            .doc(userCredential.user!.uid);
-
-        transaction.set(userRef, {
-          'email': _emailController.text,
-          'displayName': _usernameController.text,
-          'id': userCredential.user!.uid,
-        });
+      // Enregistrer le nom d'utilisateur et l'e-mail dans la collection "users"
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userCredential.user!.uid)
+          .set({
+        'email': _emailController.text,
+        'displayName': _usernameController.text,
+        'id': userCredential.user!.uid,
       });
 
       print('Utilisateur enregistré: ${userCredential.user!}');
-
-      // Se déconnecter après l'enregistrement réussi
-      await FirebaseAuth.instance.signOut();
 
       setState(() {
         _errorMessage = '';
         _successMessage = 'Inscription réussie !';
       });
 
+      // Se déconnecter après l'enregistrement réussi
+      await FirebaseAuth.instance.signOut();
+
       _clearFields();
     } catch (e) {
       print(e);
-      print('Erreur d\'enregistrement: $e');
       setState(() {
         _errorMessage = 'Erreur d\'enregistrement: $e. Veuillez réessayer.';
         _successMessage = '';

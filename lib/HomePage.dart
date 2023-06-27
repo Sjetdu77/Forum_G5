@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'screens/PostForm.dart';
 import 'screens/RegisterPage.dart';
 import 'screens/loginPage.dart';
@@ -19,10 +20,7 @@ class HomePage extends StatelessWidget {
             return Align(
               alignment: Alignment.bottomRight,
               child: Padding(
-                padding: EdgeInsets.only(
-                    bottom: 72,
-                    right:
-                        0), // Ajuster la marge bottom pour créer un espace suffisant
+                padding: EdgeInsets.only(bottom: 72, right: 0),
                 child: FloatingActionButton(
                   heroTag: 'postform',
                   onPressed: () {
@@ -43,6 +41,53 @@ class HomePage extends StatelessWidget {
       ),
       body: Stack(
         children: [
+          // StreamBuilder pour afficher la liste des messages au centre.
+          Center(
+            child: StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('messagesTest')
+                  .snapshots(),
+              builder: (BuildContext context,
+                  AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (snapshot.hasError) {
+                  return Text("Something went wrong");
+                }
+
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return CircularProgressIndicator();
+                }
+
+                // Construire une liste de messages sous forme de cartes dans un conteneur centré.
+                return Container(
+                  width: MediaQuery.of(context).size.width *
+                      0.8, // 80% de la largeur de l'écran
+                  margin: EdgeInsets.all(16.0),
+                  child: ListView(
+                    children:
+                        snapshot.data!.docs.map((DocumentSnapshot document) {
+                      Map<String, dynamic> data =
+                          document.data() as Map<String, dynamic>;
+                      return Card(
+                        elevation: 1.0,
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 8.0, vertical: 4.0),
+                        child: ListTile(
+                          contentPadding: EdgeInsets.all(10.0),
+                          title: Text(
+                            data['author'],
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          subtitle: Text(data['content']),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                );
+              },
+            ),
+          ),
           Align(
             alignment: Alignment.bottomRight,
             child: Padding(
