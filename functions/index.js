@@ -31,8 +31,9 @@ exports.onCreateUser = functions.auth.user().onCreate((user) => {
       });
 });
 exports.addMessage = functions.https.onRequest(async (req, res) => {
-  const content = req.query.text;
-  const userId = req.query.userId;
+  const content = req.body.text;
+  const userId = req.body.userId;
+
   const writeMessage = getFirestore().collection('Message')
     .add({
       content,
