@@ -61,6 +61,8 @@ android {
             signingConfig signingConfigs.debug
         }
     }
+    buildToolsVersion '30.0.3'
+    namespace 'com.example.forum_app'
 }
 
 flutter {
