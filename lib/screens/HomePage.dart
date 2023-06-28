@@ -6,6 +6,36 @@ import 'RegisterPage.dart';
 import 'loginPage.dart';
 
 class HomePage extends StatelessWidget {
+  void createReply(BuildContext context, String parentId) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => PostForm(parentId: parentId)),
+    );
+  }
+
+  Future<void> handleLike(DocumentSnapshot document) async {
+    User? currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null) {
+      DocumentReference postRef =
+          FirebaseFirestore.instance.collection('posts').doc(document.id);
+
+      // Vérifier si l'utilisateur a déjà aimé le post
+      bool isLiked = document['likes'] != null &&
+          document['likes'].contains(currentUser.uid);
+
+      if (isLiked) {
+        // Si l'utilisateur a déjà aimé le post, annuler le "like"
+        await postRef.update({
+          'likes': FieldValue.arrayRemove([currentUser.uid])
+        });
+      } else {
+        // Sinon, ajouter un "like" au post
+        await postRef.update({
+          'likes': FieldValue.arrayUnion([currentUser.uid])
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,9 +77,8 @@ class HomePage extends StatelessWidget {
           // StreamBuilder pour afficher la liste des messages au centre.
           Center(
             child: StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance
-                  .collection('messagesTest')
-                  .snapshots(),
+              stream:
+                  FirebaseFirestore.instance.collection('posts').snapshots(),
               builder: (BuildContext context,
                   AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (snapshot.hasError) {
@@ -104,16 +133,28 @@ class HomePage extends StatelessWidget {
                               Row(
                                 children: [
                                   InkWell(
-                                    onTap: () {
-                                      // Action à effectuer lors du clic sur l'icône
-                                      // Par exemple, incrémenter le nombre de likes
+                                    onTap: () async {
+                                      // Récupérer l'utilisateur actuel
+                                      User? currentUser =
+                                          FirebaseAuth.instance.currentUser;
+                                      if (currentUser != null) {
+                                        // Ajouter l'ID de l'utilisateur à la liste des "likes" dans la base de données
+                                        DocumentReference postRef =
+                                            FirebaseFirestore.instance
+                                                .collection('posts')
+                                                .doc(document.id);
+                                        await postRef.update({
+                                          'likes': FieldValue.arrayUnion(
+                                              [currentUser.uid])
+                                        });
+                                      }
                                     },
                                     child: Icon(Icons.thumb_up,
                                         color: Colors.grey),
                                   ),
                                   SizedBox(width: 4),
-                                  Text(data['like'] != null
-                                      ? data['like'].toString()
+                                  Text(data['likes'] != null
+                                      ? data['likes'].length.toString()
                                       : '0'),
                                 ],
                               ),

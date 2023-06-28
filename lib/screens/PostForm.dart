@@ -83,12 +83,12 @@ class _PostFormState extends State<PostForm> {
       if (widget.parentId.isEmpty) {
         // Création d'un nouveau post principal
         DocumentReference postRef =
-            await FirebaseFirestore.instance.collection('messagesTest').add({
+            await FirebaseFirestore.instance.collection('posts').add({
           'author': user.displayName ?? '',
           'content': _contentController.text,
           'parentId': widget.parentId,
           'date': DateTime.now(),
-          'like': 0,
+          'like': <dynamic>[],
           'MessageList': <dynamic>[],
         });
 
@@ -96,7 +96,7 @@ class _PostFormState extends State<PostForm> {
       } else {
         // Ajout d'un commentaire à un post principal existant
         DocumentSnapshot postSnapshot = await FirebaseFirestore.instance
-            .collection('messagesTest')
+            .collection('posts')
             .doc(widget.parentId)
             .get();
 
@@ -120,7 +120,7 @@ class _PostFormState extends State<PostForm> {
         existingComments.add(newComment);
 
         await FirebaseFirestore.instance
-            .collection('messagesTest')
+            .collection('posts')
             .doc(widget.parentId)
             .update({'MessageList': existingComments});
 

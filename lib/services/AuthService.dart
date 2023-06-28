@@ -33,7 +33,11 @@ class AuthService {
       await Firebase.initializeApp();
       UserCredential result = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
+
       User? user = FirebaseAuth.instance.currentUser;
+
+      // Mettre à jour le displayName dans Firebase Authentication
+      await user!.updateDisplayName(username);
       print(user);
       print('User : ' + user!.uid);
       // Ajouter l'utilisateur à la base de données
