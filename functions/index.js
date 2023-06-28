@@ -29,3 +29,16 @@ exports.onCreateUser = functions.auth.user().onCreate((user) => {
         return null;
       });
 });
+
+exports.createMessage = functions.https.onRequest(async (req, res) => {
+  try {
+    const comment = req.body;
+    const messageRef = await admin.firestore().collection('messages').add({
+      comment: comment,
+    });
+    res.status(200).json({message: 'Comment successfull', id: messageRef.id});
+  } catch (error) {
+    console.error('Error creating message:', error);
+    res.status(500).json({error: 'An error occurred while creating the msg'});
+  }
+});

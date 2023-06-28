@@ -13,6 +13,7 @@ class _LoginPageState extends State<LoginPage> {
   bool isLogin = true;
   final TextEditingController _controllerEmail = TextEditingController();
   final TextEditingController _controllerPassword = TextEditingController();
+
   Future<void> signInWithEmailAndPAssword() async {
     try {
       await Auth().signInWithEmailAndPassword(
@@ -26,11 +27,11 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  Future<void> createUserWithEmailAndPAssword() async {
+  Future<void> createUserWithEmailAndPassword() async {
     try {
       await Auth().createUserWithEmailAndPassword(
         email: _controllerEmail.text,
-        password: _controllerPassword.text,
+        password: _controllerPassword.text, // Valeur du champ "username"
       );
     } on FirebaseAuthException catch (e) {
       setState(() {
@@ -62,7 +63,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget _submitButton() {
     return ElevatedButton(
       onPressed:
-          isLogin ? signInWithEmailAndPAssword : createUserWithEmailAndPAssword,
+          isLogin ? signInWithEmailAndPAssword : createUserWithEmailAndPassword,
       child: Text(isLogin ? 'Login' : 'Register'),
     );
   }

@@ -1,5 +1,31 @@
 {
+  "name": "flutter_forum",
+  "version": "1.0.0",
+  "description": "A new Flutter project.\r #\u0000 \u0000F\u0000o\u0000r\u0000u\u0000m\u0000_\u0000G\u00005\u0000\r \u0000\r \u0000#\u0000 \u0000F\u0000o\u0000r\u0000u\u0000m\u0000_\u0000G\u00005\u0000\r \u0000\r \u0000",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "firebase deploy --only functions"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sjetdu77/Forum_G5.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Sjetdu77/Forum_G5/issues"
+  },
+  "homepage": "https://github.com/Sjetdu77/Forum_G5#readme",
+  "devDependencies": {
+    "eslint-config-google": "^0.14.0"
+  },
   "dependencies": {
-    "firebase-admin": "^11.9.0"
+    "firebase-admin": "^11.9.0",
+    "firebase-functions": "^4.4.1"
   }
 }

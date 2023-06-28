@@ -16,7 +16,7 @@ class HomePage extends StatelessWidget {
   }
 
   Widget _userUid() {
-    return Text(user?.email ?? 'User email');
+    return Text(user?.email?.split('@')[0] ?? 'User email');
   }
 
   Widget _signOutButton() {
