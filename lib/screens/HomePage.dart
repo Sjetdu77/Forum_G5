@@ -131,12 +131,14 @@ class HomePage extends StatelessWidget {
               } else {
                 if (snapshot.hasData && snapshot.data != null) {
                   // Utilisateur connecté
+                  String userUid = snapshot.data!.displayName ??
+                      ""; // Récupérer le nom d'affichage de l'utilisateur
                   return Align(
                     alignment: Alignment.topRight,
                     child: Container(
                       margin: EdgeInsets.all(16),
                       child: Text(
-                        'Logged in',
+                        'Utilisateur connecté: $userUid',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,

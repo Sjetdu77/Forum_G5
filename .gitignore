@@ -45,3 +45,6 @@ app.*.map.json
 
 # Visual Studio related
 .vs/
+# Nodes Modules
+nodes_modules/
+nodes_modules
