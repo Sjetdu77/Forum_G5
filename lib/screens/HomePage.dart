@@ -71,6 +71,8 @@ class HomePage extends StatelessWidget {
                         elevation: 1.0,
                         margin: const EdgeInsets.symmetric(
                             horizontal: 8.0, vertical: 4.0),
+                        //composant enfant
+                        //titre
                         child: ListTile(
                           contentPadding: EdgeInsets.all(10.0),
                           title: Text(
@@ -85,7 +87,14 @@ class HomePage extends StatelessWidget {
                               Text(data['content']),
                               Row(
                                 children: [
-                                  Icon(Icons.thumb_up, color: Colors.grey),
+                                  InkWell(
+                                    onTap: () {
+                                      // Action à effectuer lors du clic sur l'icône
+                                      // Par exemple, incrémenter le nombre de likes
+                                    },
+                                    child: Icon(Icons.thumb_up,
+                                        color: Colors.grey),
+                                  ),
                                   SizedBox(width: 4),
                                   Text(data['like'] != null
                                       ? data['like'].toString()
@@ -93,6 +102,14 @@ class HomePage extends StatelessWidget {
                                 ],
                               ),
                             ],
+                          ),
+                          //bouton a droite pour message
+                          trailing: IconButton(
+                            icon: Icon(Icons.add),
+                            onPressed: () {
+                              // Action à effectuer lorsque le bouton "+" est cliqué.
+                              // Vous pouvez ajouter votre logique ici pour ajouter quelque chose en relation avec ce commentaire.
+                            },
                           ),
                         ),
                       );
