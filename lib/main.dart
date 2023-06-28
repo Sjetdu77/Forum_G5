@@ -3,9 +3,9 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 
-import '/screens/loginPage.dart';
+import 'screens/login_page.dart';
 import '/screens/registerPage.dart';
-import 'HomePage.dart';
+import 'home_page.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
         '/': (context) =>
             const HomePage(), // Définir la route par défaut comme la `HomePage`.
         '/login': (context) => const LoginPage(),
-        '/register': (context) => RegisterPage(),
+        '/register': (context) => const RegisterPage(),
       },
     );
   }

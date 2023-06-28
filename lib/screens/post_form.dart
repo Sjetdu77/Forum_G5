@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+//import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PostForm extends StatefulWidget {
   const PostForm({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _PostFormState createState() => _PostFormState();
 }
 
@@ -78,14 +79,14 @@ class _PostFormState extends State<PostForm> {
     }
 
     try {
-      DocumentReference docRef =
+      /*DocumentReference docRef =
           await FirebaseFirestore.instance.collection('messagesTest').add({
         'id': user.uid,
         'content': _contentController.text,
         'author': user.displayName ?? '',
       });
 
-      print('Post créé avec succès: ${docRef.id}');
+      print('Post créé avec succès: ${docRef.id}');*/
 
       setState(() {
         _errorMessage = '';
@@ -94,7 +95,7 @@ class _PostFormState extends State<PostForm> {
 
       _contentController.clear();
     } catch (e) {
-      print('Erreur lors de la création du post: $e');
+      //print('Erreur lors de la création du post: $e');
       setState(() {
         _errorMessage =
             'Erreur lors de la création du post. Veuillez réessayer.';

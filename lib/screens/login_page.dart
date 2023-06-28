@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import '../HomePage.dart';
-import 'RegisterPage.dart';
+//import 'package:firebase_auth/firebase_auth.dart';
+import '../home_page.dart';
+import 'register_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _LoginPageState createState() => _LoginPageState();
 }
 
@@ -67,19 +68,19 @@ class _LoginPageState extends State<LoginPage> {
 
   void _login() async {
     try {
-      UserCredential userCredential =
+      /*UserCredential userCredential =
           await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _emailController.text,
         password: _passwordController.text,
       );
-      print('Utilisateur connecté: ${userCredential.user}');
+      print('Utilisateur connecté: ${userCredential.user}');*/
 
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const HomePage()),
       );
     } catch (e) {
-      print('Erreur de connexion: $e');
+      //print('Erreur de connexion: $e');
       setState(() {
         _errorMessage =
             'Erreur de connexion. Veuillez vérifier vos identifiants.';

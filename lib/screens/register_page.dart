@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'loginPage.dart';
+import 'login_page.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _RegisterPageState createState() => _RegisterPageState();
 }
 
@@ -112,7 +113,7 @@ class _RegisterPageState extends State<RegisterPage> {
         'id': userCredential.user!.uid,
       });
 
-      print('Utilisateur enregistré: ${userCredential.user!}');
+      //print('Utilisateur enregistré: ${userCredential.user!}');
 
       setState(() {
         _errorMessage = '';
@@ -124,7 +125,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
       _clearFields();
     } catch (e) {
-      print(e);
+      //print(e);
       setState(() {
         _errorMessage = 'Erreur d\'enregistrement: $e. Veuillez réessayer.';
         _successMessage = '';
