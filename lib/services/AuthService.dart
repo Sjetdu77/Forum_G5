@@ -42,7 +42,7 @@ class AuthService {
       print('User : ' + user!.uid);
       // Ajouter l'utilisateur à la base de données
       await Future.delayed(Duration(seconds: 2));
-
+      await user!.updateDisplayName(username);
       await _firestore.collection('users').doc(user!.uid).set({
         'email': email,
         'displayName': username,

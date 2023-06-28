@@ -7,19 +7,15 @@ import 'LoginPage.dart';
 
 class HomePage extends StatelessWidget {
   void createReply(BuildContext context, String userId) async {
-    // Naviguer vers la page PostForm et obtenir le résultat (nouveau commentaire)
     final newComment = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => PostForm(postId: userId)),
     );
 
-    // Vérifier si un nouveau commentaire a été renvoyé
     if (newComment != null) {
-      // Obtenir la référence du post original
       DocumentReference postRef =
           FirebaseFirestore.instance.collection('posts').doc(userId);
 
-      // Ajouter le nouveau commentaire à messageList
       postRef.update({
         'messageList': FieldValue.arrayUnion([newComment])
       });
@@ -32,21 +28,64 @@ class HomePage extends StatelessWidget {
       DocumentReference postRef =
           FirebaseFirestore.instance.collection('posts').doc(document.id);
 
-      // Vérifier si l'utilisateur a déjà aimé le post
       bool isLiked = document['likes'] != null &&
           document['likes'].contains(currentUser.uid);
 
       if (isLiked) {
-        // Si l'utilisateur a déjà aimé le post, annuler le "like"
         await postRef.update({
           'likes': FieldValue.arrayRemove([currentUser.uid])
         });
       } else {
-        // Sinon, ajouter un "like" au post
         await postRef.update({
           'likes': FieldValue.arrayUnion([currentUser.uid])
         });
       }
+    }
+  }
+
+  Future<void> deleteAccount(BuildContext context) async {
+    // Obtenir l'instance de Firebase Auth et Firestore
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+    // Obtenir l'utilisateur actuellement connecté
+    final User? currentUser = auth.currentUser;
+
+    if (currentUser != null) {
+      final String userId = currentUser.uid;
+
+      // 1. Supprimer les posts de l'utilisateur
+      final QuerySnapshot userPosts = await firestore
+          .collection('posts')
+          .where('author', isEqualTo: userId)
+          .get();
+      for (final post in userPosts.docs) {
+        await post.reference.delete();
+      }
+
+      // 1. Supprimer les commentaires de l'utilisateur (si stockés séparément)
+      final QuerySnapshot userComments = await firestore
+          .collection('comments')
+          .where('author', isEqualTo: userId)
+          .get();
+      for (final comment in userComments.docs) {
+        await comment.reference.delete();
+      }
+
+      // 2. Supprimer l'utilisateur dans Firestore (si vous stockez des données de profil séparées)
+      await firestore.collection('users').doc(userId).delete();
+
+      // 3. Supprimer le compte utilisateur dans Firebase Authentication
+      await currentUser.delete().catchError((error) {
+        // Gérer les erreurs (par exemple, si l'utilisateur doit se reconnecter)
+        print("Erreur lors de la suppression du compte: $error");
+      });
+
+      // Rediriger l'utilisateur vers la page de connexion
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage()),
+      );
     }
   }
 
@@ -56,38 +95,8 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         title: Text('Home'),
       ),
-      floatingActionButton: StreamBuilder<User?>(
-        stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (BuildContext context, snapshot) {
-          if (snapshot.hasData && snapshot.data != null) {
-            // Utilisateur connecté
-            return Align(
-              alignment: Alignment.bottomRight,
-              child: Padding(
-                padding: EdgeInsets.only(bottom: 72, right: 0),
-                child: FloatingActionButton(
-                  heroTag: 'postform',
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => PostForm(),
-                      ),
-                    );
-                  },
-                  child: Icon(Icons.add),
-                ),
-              ),
-            );
-          } else {
-            // Utilisateur non connecté
-            return Container();
-          }
-        },
-      ),
       body: Stack(
         children: [
-          // StreamBuilder pour afficher la liste des messages au centre.
           Center(
             child: StreamBuilder<QuerySnapshot>(
               stream:
@@ -102,10 +111,8 @@ class HomePage extends StatelessWidget {
                   return CircularProgressIndicator();
                 }
 
-                // Construire une liste de messages sous forme de cartes dans un conteneur centré.
                 return Container(
-                  width: MediaQuery.of(context).size.width *
-                      0.8, // 80% de la largeur de l'écran
+                  width: MediaQuery.of(context).size.width * 0.8,
                   margin: EdgeInsets.all(16.0),
                   child: ListView(
                     children:
@@ -119,8 +126,6 @@ class HomePage extends StatelessWidget {
                         elevation: 1.0,
                         margin: const EdgeInsets.symmetric(
                             horizontal: 8.0, vertical: 4.0),
-                        //composant enfant
-                        //titre
                         child: ListTile(
                           contentPadding: EdgeInsets.all(10.0),
                           title: Text(
@@ -141,6 +146,16 @@ class HomePage extends StatelessWidget {
                                   return ListTile(
                                     title: Text(comment['authorName'] ?? ''),
                                     subtitle: Text(comment['content'] ?? ''),
+                                    trailing: FirebaseAuth
+                                                .instance.currentUser?.uid ==
+                                            comment['author']
+                                        ? IconButton(
+                                            icon: Icon(Icons.delete),
+                                            onPressed: () {
+                                              // Logic to delete comment
+                                            },
+                                          )
+                                        : null,
                                   );
                                 },
                               ),
@@ -185,12 +200,28 @@ class HomePage extends StatelessWidget {
                               ),
                             ],
                           ),
-                          //bouton à droite pour message
-                          trailing: InkWell(
-                            onTap: () {
-                              createReply(context, document.id);
-                            },
-                            child: Icon(Icons.add),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              InkWell(
+                                onTap: () {
+                                  createReply(context, document.id);
+                                },
+                                child: Icon(Icons.add),
+                              ),
+                              FirebaseAuth.instance.currentUser?.uid ==
+                                      data['author']
+                                  ? IconButton(
+                                      icon: Icon(Icons.delete),
+                                      onPressed: () {
+                                        FirebaseFirestore.instance
+                                            .collection('posts')
+                                            .doc(document.id)
+                                            .delete();
+                                      },
+                                    )
+                                  : Container(),
+                            ],
                           ),
                         ),
                       );
@@ -200,27 +231,57 @@ class HomePage extends StatelessWidget {
               },
             ),
           ),
+          // Aligner les boutons flottants en bas à droite
           Align(
             alignment: Alignment.bottomRight,
             child: Padding(
               padding: EdgeInsets.all(16),
-              child: FloatingActionButton(
-                onPressed: () {
-                  FirebaseAuth.instance.currentUser != null
-                      ? FirebaseAuth.instance.signOut()
-                      : Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => LoginPage()),
-                        );
-                },
-                child: Icon(
-                  FirebaseAuth.instance.currentUser != null
-                      ? Icons.logout
-                      : Icons.login,
-                ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  // Vérifier si l'utilisateur est connecté avant d'afficher le bouton de suppression de compte
+                  if (FirebaseAuth.instance.currentUser != null)
+                    FloatingActionButton(
+                      heroTag: 'deleteAccount',
+                      onPressed: () {
+                        deleteAccount(context);
+                      },
+                      child: Icon(Icons.delete),
+                    ),
+                  FloatingActionButton(
+                    heroTag: 'postform',
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PostForm(),
+                        ),
+                      );
+                    },
+                    child: Icon(Icons.add),
+                  ),
+                  FloatingActionButton(
+                    heroTag: 'logout',
+                    onPressed: () {
+                      FirebaseAuth.instance.currentUser != null
+                          ? FirebaseAuth.instance.signOut()
+                          : Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => LoginPage()),
+                            );
+                    },
+                    child: Icon(
+                      FirebaseAuth.instance.currentUser != null
+                          ? Icons.logout
+                          : Icons.login,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
+
           StreamBuilder<User?>(
             stream: FirebaseAuth.instance.authStateChanges(),
             builder: (BuildContext context, snapshot) {
@@ -228,9 +289,7 @@ class HomePage extends StatelessWidget {
                 return Center(child: CircularProgressIndicator());
               } else {
                 if (snapshot.hasData && snapshot.data != null) {
-                  // Utilisateur connecté
-                  String userUid = snapshot.data!.displayName ??
-                      ""; // Récupérer le nom d'affichage de l'utilisateur
+                  String userUid = snapshot.data!.displayName ?? "";
                   return Align(
                     alignment: Alignment.topRight,
                     child: Container(
@@ -245,7 +304,6 @@ class HomePage extends StatelessWidget {
                     ),
                   );
                 } else {
-                  // Utilisateur non connecté
                   return Align(
                     alignment: Alignment.topRight,
                     child: Container(
