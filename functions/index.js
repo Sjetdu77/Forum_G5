@@ -1,5 +1,5 @@
 const admin = require("firebase-admin");
-const {getFirestore} = require("firebase-admin/firestore")
+const {getFirestore} = require("firebase-admin/firestore");
 admin.initializeApp();
 
 const db = admin.firestore();
@@ -35,11 +35,11 @@ exports.addMessage = functions.https.onRequest(async (req, res) => {
   const userId = req.body.userId;
 
   const writeMessage = getFirestore().collection('Message')
-    .add({
-      content,
-      dateCreation: Date.now(),
-      userId
-    });
+      .add({
+        content,
+        dateCreation: Date.now(),
+        userId,
+      });
 
   res.json({result: `Message with ID: ${writeMessage.id} added.`});
 });
