@@ -4,24 +4,23 @@ class Message {
   late final String id;
   late final String userId;
   late final String content;
-  late final int milliCreation;
   late final DateTime dateCreation;
 
-  Message(this.id, this.userId, this.content, this.milliCreation) {
-    dateCreation = DateTime.fromMillisecondsSinceEpoch(milliCreation);
+  Message(this.id, this.userId, this.content, Timestamp timestamp) {
+    dateCreation = timestamp.toDate();
   }
 
   Message.fromDocumentSnapshot(DocumentSnapshot<Map<String, dynamic>> doc)
       : id = doc.id,
         userId = doc.data()!['userId'],
         content = doc.data()!['content'],
-        milliCreation = doc.data()!['dateCreation'];
+        dateCreation = doc.data()!['dateCreation'].toDate();
 
   Map<String, dynamic> toMap() {
     return {
       'userId': userId,
       'content': content,
-      'milliCreation': milliCreation
+      'dateCreation': Timestamp.fromDate(dateCreation)
     };
   }
 }

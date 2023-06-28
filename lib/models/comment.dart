@@ -5,11 +5,10 @@ class Comment {
   late final String userId;
   late final String messageId;
   late final String content;
-  late final int milliCreation;
   late final DateTime dateCreation;
 
-  Comment(this.id, this.userId, this.messageId, this.content, this.milliCreation) {
-    dateCreation = DateTime.fromMillisecondsSinceEpoch(milliCreation);
+  Comment(this.id, this.userId, this.messageId, this.content, Timestamp timestamp) {
+    dateCreation = timestamp.toDate();
   }
 
   Comment.fromDocumentSnapshot(DocumentSnapshot<Map<String, dynamic>> doc)
@@ -17,14 +16,14 @@ class Comment {
         userId = doc.data()!['userId'],
         messageId = doc.data()!['messageId'],
         content = doc.data()!['content'],
-        milliCreation = doc.data()!['milliCreation'];
+        dateCreation = doc.data()!['dateCreation'].toDate();
 
   Map<String, dynamic> toMap() {
     return {
       'userId': userId,
       'messageId': messageId,
       'content': content,
-      'milliCreation': milliCreation
+      'dateCreation': Timestamp.fromDate(dateCreation)
     };
   }
 }
