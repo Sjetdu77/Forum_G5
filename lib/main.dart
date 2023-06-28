@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import '/screens/loginPage.dart';
 import '/screens/registerPage.dart';
-import 'HomePage.dart';
+import '/screens/HomePage.dart';
 import 'firebase_options.dart';
 
 void main() async {

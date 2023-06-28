@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../services/AuthService.dart';
 import 'loginPage.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -15,6 +16,9 @@ class _RegisterPageState extends State<RegisterPage> {
       TextEditingController(); // Nouveau contrôleur pour le nom d'utilisateur
   String _errorMessage = '';
   String _successMessage = '';
+
+  final AuthService _authService =
+      AuthService(); // Créer une instance de AuthService
 
   @override
   Widget build(BuildContext context) {
@@ -85,46 +89,30 @@ class _RegisterPageState extends State<RegisterPage> {
 
   void _register() async {
     try {
-      UserCredential userCredential =
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: _emailController.text,
-        password: _passwordController.text,
+      User? user = await _authService.registerWithEmailAndPassword(
+        _emailController.text,
+        _passwordController.text,
+        _usernameController.text,
       );
 
-      // Mettre à jour le nom d'affichage de l'utilisateur avec la valeur du contrôleur
-      await userCredential.user!.updateDisplayName(_usernameController.text);
-
-      // Recharger l'utilisateur pour obtenir les dernières informations depuis Firebase
-      await userCredential.user!.reload();
-
-      // Introduire un délai de 2 secondes
-      await Future.delayed(Duration(seconds: 2));
-
-      // Enregistrer le nom d'utilisateur et l'e-mail dans la collection "users"
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userCredential.user!.uid)
-          .set({
-        'email': _emailController.text,
-        'displayName': _usernameController.text,
-        'id': userCredential.user!.uid,
-      });
-
-      print('Utilisateur enregistré: ${userCredential.user!}');
-
-      setState(() {
-        _errorMessage = '';
-        _successMessage = 'Inscription réussie !';
-      });
-
-      // Se déconnecter après l'enregistrement réussi
-      await FirebaseAuth.instance.signOut();
-
-      _clearFields();
+      if (user != null) {
+        // Utilisateur enregistré avec succès
+        setState(() {
+          _errorMessage = '';
+          _successMessage = 'Inscription réussie !';
+        });
+      } else {
+        // Erreur lors de l'enregistrement
+        setState(() {
+          _errorMessage = 'Erreur lors de l\'inscription. Veuillez réessayer.';
+          _successMessage = '';
+        });
+      }
     } catch (e) {
       print(e);
       setState(() {
-        _errorMessage = 'Erreur d\'enregistrement: $e. Veuillez réessayer.';
+        _errorMessage =
+            'Erreur lors de l\'inscription: $e. Veuillez réessayer.';
         _successMessage = '';
       });
     }

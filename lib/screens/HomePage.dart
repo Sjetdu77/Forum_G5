@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'screens/PostForm.dart';
-import 'screens/RegisterPage.dart';
-import 'screens/loginPage.dart';
+import 'PostForm.dart';
+import 'RegisterPage.dart';
+import 'loginPage.dart';
 
 class HomePage extends StatelessWidget {
   @override
