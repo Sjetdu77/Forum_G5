@@ -3,9 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PostForm extends StatefulWidget {
-  final String parentId; // Modifier le nom ici
+  final String? postId;
 
-  PostForm({required this.parentId}); // Utiliser le nom ici
+  PostForm({this.postId});
 
   @override
   _PostFormState createState() => _PostFormState();
@@ -46,13 +46,9 @@ class _PostFormState extends State<PostForm> {
             ),
             Visibility(
               visible: _successMessage.isNotEmpty,
-              child: Column(
-                children: [
-                  Text(
-                    _successMessage,
-                    style: TextStyle(color: Colors.green),
-                  ),
-                ],
+              child: Text(
+                _successMessage,
+                style: TextStyle(color: Colors.green),
               ),
             ),
           ],
@@ -80,56 +76,34 @@ class _PostFormState extends State<PostForm> {
     }
 
     try {
-      if (widget.parentId.isEmpty) {
+      if (widget.postId == null) {
         // Création d'un nouveau post principal
-        DocumentReference postRef =
-            await FirebaseFirestore.instance.collection('posts').add({
-          'author': user.displayName ?? '',
+        Map<String, dynamic> postData = {
+          'author': user.uid,
+          'authorName': user.displayName,
           'content': _contentController.text,
-          'parentId': widget.parentId,
-          'date': DateTime.now(),
-          'like': <dynamic>[],
-          'MessageList': <dynamic>[],
-        });
-
-        print('Post principal créé avec succès: ${postRef.id}');
+          'datePosting': DateTime.now(),
+          'messageList': [],
+          'likes': [],
+        };
+        await FirebaseFirestore.instance.collection('posts').add(postData);
+        _successMessage = 'Post créé avec succès!';
       } else {
         // Ajout d'un commentaire à un post principal existant
-        DocumentSnapshot postSnapshot = await FirebaseFirestore.instance
-            .collection('posts')
-            .doc(widget.parentId)
-            .get();
-
-        if (!postSnapshot.exists) {
-          print('Post principal introuvable');
-          return;
-        }
-
-        List<dynamic> existingComments =
-            (postSnapshot.data() as Map<String, dynamic>)['MessageList'] ??
-                <dynamic>[];
-
-        Map<String, dynamic> newComment = {
-          'id': user.uid,
+        Map<String, dynamic> commentData = {
+          'author': user.uid,
+          'authorName': user.displayName,
           'content': _contentController.text,
-          'author': user.displayName ?? '',
-          'date': DateTime.now(),
-          'like': 0,
+          'datePosting': DateTime.now(),
+          'messageList': [],
+          'likes': [],
         };
-
-        existingComments.add(newComment);
-
-        await FirebaseFirestore.instance
-            .collection('posts')
-            .doc(widget.parentId)
-            .update({'MessageList': existingComments});
-
-        print('Commentaire ajouté avec succès');
+        await addCommentToPost(widget.postId!, commentData);
+        _successMessage = 'Commentaire ajouté avec succès!';
       }
 
       setState(() {
         _errorMessage = '';
-        _successMessage = 'Post créé avec succès!';
       });
 
       _contentController.clear();
@@ -138,9 +112,29 @@ class _PostFormState extends State<PostForm> {
       print('Erreur lors de la création du post: $e');
       setState(() {
         _errorMessage =
-            'Erreur lors de la création du post. Veuillez réessayer.';
+            'Erreur lors de la création dupost. Veuillez réessayer.';
         _successMessage = '';
       });
     }
+  }
+
+  Future<void> addCommentToPost(
+      String postId, Map<String, dynamic> commentData) async {
+    DocumentSnapshot postSnapshot =
+        await FirebaseFirestore.instance.collection('posts').doc(postId).get();
+
+    if (!postSnapshot.exists) {
+      print('Post principal introuvable');
+      return;
+    }
+
+    List<dynamic> existingComments = postSnapshot['messageList'] ?? <dynamic>[];
+
+    existingComments.add(commentData);
+
+    await FirebaseFirestore.instance
+        .collection('posts')
+        .doc(postId)
+        .update({'messageList': existingComments});
   }
 }

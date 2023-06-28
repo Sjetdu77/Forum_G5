@@ -3,14 +3,27 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'PostForm.dart';
 import 'RegisterPage.dart';
-import 'loginPage.dart';
+import 'LoginPage.dart';
 
 class HomePage extends StatelessWidget {
-  void createReply(BuildContext context, String parentId) {
-    Navigator.push(
+  void createReply(BuildContext context, String userId) async {
+    // Naviguer vers la page PostForm et obtenir le résultat (nouveau commentaire)
+    final newComment = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => PostForm(parentId: parentId)),
+      MaterialPageRoute(builder: (context) => PostForm(postId: userId)),
     );
+
+    // Vérifier si un nouveau commentaire a été renvoyé
+    if (newComment != null) {
+      // Obtenir la référence du post original
+      DocumentReference postRef =
+          FirebaseFirestore.instance.collection('posts').doc(userId);
+
+      // Ajouter le nouveau commentaire à messageList
+      postRef.update({
+        'messageList': FieldValue.arrayUnion([newComment])
+      });
+    }
   }
 
   Future<void> handleLike(DocumentSnapshot document) async {
@@ -58,7 +71,7 @@ class HomePage extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => PostForm(parentId: ""),
+                        builder: (context) => PostForm(),
                       ),
                     );
                   },
@@ -100,7 +113,7 @@ class HomePage extends StatelessWidget {
                       Map<String, dynamic> data =
                           document.data() as Map<String, dynamic>;
                       List<dynamic> comments =
-                          data['MessageList'] ?? <dynamic>[];
+                          data['messageList'] ?? <dynamic>[];
 
                       return Card(
                         elevation: 1.0,
@@ -111,7 +124,7 @@ class HomePage extends StatelessWidget {
                         child: ListTile(
                           contentPadding: EdgeInsets.all(10.0),
                           title: Text(
-                            data['author'] != null ? data['author'] : '',
+                            data['authorName'] ?? '',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                             ),
@@ -119,14 +132,15 @@ class HomePage extends StatelessWidget {
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(data['content']),
+                              Text(data['content'] ?? ''),
                               ListView.builder(
                                 shrinkWrap: true,
                                 itemCount: comments.length,
                                 itemBuilder: (context, index) {
+                                  var comment = comments[index];
                                   return ListTile(
-                                    title: Text(comments[index]['author']),
-                                    subtitle: Text(comments[index]['content']),
+                                    title: Text(comment['authorName'] ?? ''),
+                                    subtitle: Text(comment['content'] ?? ''),
                                   );
                                 },
                               ),
@@ -134,33 +148,44 @@ class HomePage extends StatelessWidget {
                                 children: [
                                   InkWell(
                                     onTap: () async {
-                                      // Récupérer l'utilisateur actuel
                                       User? currentUser =
                                           FirebaseAuth.instance.currentUser;
                                       if (currentUser != null) {
-                                        // Ajouter l'ID de l'utilisateur à la liste des "likes" dans la base de données
-                                        DocumentReference postRef =
-                                            FirebaseFirestore.instance
-                                                .collection('posts')
-                                                .doc(document.id);
-                                        await postRef.update({
-                                          'likes': FieldValue.arrayUnion(
-                                              [currentUser.uid])
-                                        });
+                                        await handleLike(document);
                                       }
                                     },
-                                    child: Icon(Icons.thumb_up,
-                                        color: Colors.grey),
+                                    child: StreamBuilder<User?>(
+                                      stream: FirebaseAuth.instance
+                                          .authStateChanges(),
+                                      builder:
+                                          (BuildContext context, snapshot) {
+                                        User? currentUser = snapshot.data;
+                                        bool isLiked = (document.data() as Map<
+                                                    String, dynamic>)?['likes']
+                                                ?.contains(currentUser?.uid) ??
+                                            false;
+                                        return Icon(
+                                          Icons.thumb_up,
+                                          color: isLiked
+                                              ? Colors.blue
+                                              : Colors.grey,
+                                        );
+                                      },
+                                    ),
                                   ),
                                   SizedBox(width: 4),
-                                  Text(data['likes'] != null
-                                      ? data['likes'].length.toString()
-                                      : '0'),
+                                  Flexible(
+                                    child: Text((document.data() as Map<String,
+                                                dynamic>)?['likes']
+                                            ?.length
+                                            ?.toString() ??
+                                        '0'),
+                                  ),
                                 ],
                               ),
                             ],
                           ),
-                          //bouton a droite pour message
+                          //bouton à droite pour message
                           trailing: InkWell(
                             onTap: () {
                               createReply(context, document.id);
