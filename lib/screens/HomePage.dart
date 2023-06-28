@@ -6,6 +6,7 @@ import 'RegisterPage.dart';
 import 'loginPage.dart';
 
 class HomePage extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,7 +27,9 @@ class HomePage extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => PostForm()),
+                      MaterialPageRoute(
+                        builder: (context) => PostForm(parentId: ""),
+                      ),
                     );
                   },
                   child: Icon(Icons.add),
@@ -67,6 +70,9 @@ class HomePage extends StatelessWidget {
                         snapshot.data!.docs.map((DocumentSnapshot document) {
                       Map<String, dynamic> data =
                           document.data() as Map<String, dynamic>;
+                      List<dynamic> comments =
+                          data['MessageList'] ?? <dynamic>[];
+
                       return Card(
                         elevation: 1.0,
                         margin: const EdgeInsets.symmetric(
@@ -76,7 +82,7 @@ class HomePage extends StatelessWidget {
                         child: ListTile(
                           contentPadding: EdgeInsets.all(10.0),
                           title: Text(
-                            data['author'],
+                            data['author'] != null ? data['author'] : '',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                             ),
@@ -85,6 +91,16 @@ class HomePage extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(data['content']),
+                              ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: comments.length,
+                                itemBuilder: (context, index) {
+                                  return ListTile(
+                                    title: Text(comments[index]['author']),
+                                    subtitle: Text(comments[index]['content']),
+                                  );
+                                },
+                              ),
                               Row(
                                 children: [
                                   InkWell(
@@ -104,12 +120,11 @@ class HomePage extends StatelessWidget {
                             ],
                           ),
                           //bouton a droite pour message
-                          trailing: IconButton(
-                            icon: Icon(Icons.add),
-                            onPressed: () {
-                              // Action à effectuer lorsque le bouton "+" est cliqué.
-                              // Vous pouvez ajouter votre logique ici pour ajouter quelque chose en relation avec ce commentaire.
+                          trailing: InkWell(
+                            onTap: () {
+                              createReply(context, document.id);
                             },
+                            child: Icon(Icons.add),
                           ),
                         ),
                       );
