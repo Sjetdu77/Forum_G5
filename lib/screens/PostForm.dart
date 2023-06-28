@@ -76,11 +76,18 @@ class _PostFormState extends State<PostForm> {
     }
 
     try {
+      // Obtenir la date actuelle
+      var currentDate = DateTime.now();
+
+      // Créer un document dans la collection 'posts'
       DocumentReference docRef =
-          await FirebaseFirestore.instance.collection('messagesTest').add({
-        'id': user.uid,
-        'content': _contentController.text,
+          await FirebaseFirestore.instance.collection('posts').add({
+        'idUser': user.uid,
         'author': user.displayName ?? '',
+        'content': _contentController.text,
+        'datePosting': currentDate,
+        'messagesList': [],
+        'likes': []
       });
 
       print('Post créé avec succès: ${docRef.id}');

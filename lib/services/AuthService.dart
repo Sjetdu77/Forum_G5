@@ -19,11 +19,11 @@ class AuthService {
     }
   }
 
-  Future<void> userSetup(String displayName) async {
+  Future<void> userSetup(String displayName, email) async {
     CollectionReference users = FirebaseFirestore.instance.collection('users');
     FirebaseAuth auth = FirebaseAuth.instance;
     String uid = auth.currentUser!.uid.toString();
-    users.add({'displayName': displayName, 'id': uid});
+    users.add({'displayName': displayName, 'id': uid, 'email': email});
   }
 
   // Register with email & password
@@ -41,11 +41,11 @@ class AuthService {
 
       await _firestore.collection('users').doc(user!.uid).set({
         'email': email,
-        'username': username,
+        'displayName': username,
         'id': user!.uid,
         // Ajout d'autres champs utilisateur si nécessaire
       });
-      userSetup(username);
+      userSetup(username, email);
       return user;
     } catch (error) {
       print(error.toString());
