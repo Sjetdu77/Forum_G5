@@ -79,7 +79,21 @@ class HomePage extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          subtitle: Text(data['content']),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(data['content']),
+                              Row(
+                                children: [
+                                  Icon(Icons.thumb_up, color: Colors.grey),
+                                  SizedBox(width: 4),
+                                  Text(data['like'] != null
+                                      ? data['like'].toString()
+                                      : '0'),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       );
                     }).toList(),
