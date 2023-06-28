@@ -3,12 +3,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PostForm extends StatefulWidget {
+  const PostForm({super.key});
+
   @override
   _PostFormState createState() => _PostFormState();
 }
 
 class _PostFormState extends State<PostForm> {
-  TextEditingController _contentController = TextEditingController();
+  final TextEditingController _contentController = TextEditingController();
   String _errorMessage = '';
   String _successMessage = '';
 
@@ -16,29 +18,29 @@ class _PostFormState extends State<PostForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Nouveau Post'),
+        title: const Text('Nouveau Post'),
       ),
       body: Container(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextField(
               controller: _contentController,
-              decoration: InputDecoration(labelText: 'Contenu'),
+              decoration: const InputDecoration(labelText: 'Contenu'),
               maxLines: 4,
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
                 _post();
               },
-              child: Text('Poster'),
+              child: const Text('Poster'),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Text(
               _errorMessage,
-              style: TextStyle(color: Colors.red),
+              style: const TextStyle(color: Colors.red),
             ),
             Visibility(
               visible: _successMessage.isNotEmpty,
@@ -46,7 +48,7 @@ class _PostFormState extends State<PostForm> {
                 children: [
                   Text(
                     _successMessage,
-                    style: TextStyle(color: Colors.green),
+                    style: const TextStyle(color: Colors.green),
                   ),
                 ],
               ),
