@@ -31,7 +31,7 @@ class HomePage extends StatelessWidget {
                 }
 
                 return Container(
-                  width: MediaQuery.of(context).size.width * 0.8,
+                  width: MediaQuery.of(context).size.width * 0.75,
                   margin: EdgeInsets.all(16.0),
                   child: ListView(
                     children:
@@ -275,7 +275,7 @@ class HomePage extends StatelessWidget {
                     child: Container(
                       margin: EdgeInsets.all(16),
                       child: Text(
-                        'Utilisateur connecté: $userUid',
+                        'Connecté: $userUid',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
