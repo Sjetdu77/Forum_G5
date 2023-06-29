@@ -16,6 +16,7 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("Post App"),
+        automaticallyImplyLeading: false,
       ),
       body: Stack(
         children: [

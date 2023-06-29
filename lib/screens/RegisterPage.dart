@@ -93,6 +93,17 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   void _register() async {
+    String username = _usernameController.text.trim();
+
+    // Vérifier si le champ username est vide
+    if (username.isEmpty) {
+      setState(() {
+        _errorMessage = 'Le nom d\'utilisateur ne peut pas être vide.';
+        _isRegistering = false;
+      });
+      return; // Arrêter l'exécution de la fonction ici si le nom d'utilisateur est vide
+    }
+
     setState(() {
       _isRegistering = true; // Définir l'état d'inscription comme vrai
       _successMessage = ''; // Réinitialiser le message de réussite
@@ -102,7 +113,7 @@ class _RegisterPageState extends State<RegisterPage> {
       User? user = await _authService.registerWithEmailAndPassword(
         _emailController.text,
         _passwordController.text,
-        _usernameController.text,
+        username,
       );
 
       if (user != null) {
