@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../models/comment.dart';
-import '../models/image.dart';
 import '../models/message.dart';
 import '../models/user.dart';
 
@@ -9,11 +8,11 @@ class DatabaseService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   addMessage(Message message) async {
-    await _db.collection('messages').add(message.toMap());
+    await _db.collection('messagesTest').add(message.toMap());
   }
 
   editMessage(Message message) async {
-    await _db.collection('messages').doc(message.id).update(message.toMap());
+    await _db.collection('messagesTest').doc(message.id).update(message.toMap());
   }
 
   /*deleteMessage(String messageId) async {
@@ -26,14 +25,6 @@ class DatabaseService {
 
   modifyUser(User user) async {
     await _db.collection('users').doc(user.id).update(user.toMap());
-  }
-
-  addImage(Image image) async {
-    await _db.collection('images').add(image.toMap());
-  }
-
-  editImage(Image image) async {
-    await _db.collection('images').doc(image.id).update(image.toMap());
   }
 
   replyToMessage(Comment comment) async {
@@ -55,7 +46,7 @@ class DatabaseService {
 
   Future<List<Message>> retrieveMessages() async {
     QuerySnapshot<Map<String, dynamic>> snapshot =
-        await _db.collection('messages').get();
+        await _db.collection('messagesTest').get();
 
     return snapshot.docs
         .map((docSnapshot) => Message.fromDocumentSnapshot(docSnapshot))
