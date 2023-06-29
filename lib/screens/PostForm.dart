@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../services/functionPage.dart';
+
 class PostForm extends StatefulWidget {
   final String? postId;
 
@@ -18,40 +20,42 @@ class _PostFormState extends State<PostForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Nouveau Post'),
-      ),
-      body: Container(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextField(
-              controller: _contentController,
-              decoration: InputDecoration(labelText: 'Contenu'),
-              maxLines: 4,
-            ),
-            SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                _post();
-              },
-              child: Text('Poster'),
-            ),
-            SizedBox(height: 16),
-            Text(
-              _errorMessage,
-              style: TextStyle(color: Colors.red),
-            ),
-            Visibility(
-              visible: _successMessage.isNotEmpty,
-              child: Text(
-                _successMessage,
-                style: TextStyle(color: Colors.green),
+    return PageWithFloatingButton(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Nouveau Post'),
+        ),
+        body: Container(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextField(
+                controller: _contentController,
+                decoration: InputDecoration(labelText: 'Contenu'),
+                maxLines: 4,
               ),
-            ),
-          ],
+              SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  _post();
+                },
+                child: Text('Poster'),
+              ),
+              SizedBox(height: 16),
+              Text(
+                _errorMessage,
+                style: TextStyle(color: Colors.red),
+              ),
+              Visibility(
+                visible: _successMessage.isNotEmpty,
+                child: Text(
+                  _successMessage,
+                  style: TextStyle(color: Colors.green),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

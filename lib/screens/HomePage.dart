@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../services/functionPage.dart';
 import 'PostForm.dart';
 import 'RegisterPage.dart';
 import 'LoginPage.dart';
@@ -151,8 +152,19 @@ class HomePage extends StatelessWidget {
                                             comment['author']
                                         ? IconButton(
                                             icon: Icon(Icons.delete),
-                                            onPressed: () {
-                                              // Logic to delete comment
+                                            onPressed: () async {
+                                              // Obtenir la référence du document
+                                              DocumentReference postRef =
+                                                  FirebaseFirestore.instance
+                                                      .collection('posts')
+                                                      .doc(document.id);
+
+                                              // Supprimer le commentaire de l'array messageList
+                                              await postRef.update({
+                                                'messageList':
+                                                    FieldValue.arrayRemove(
+                                                        [comment])
+                                              });
                                             },
                                           )
                                         : null,
@@ -238,44 +250,85 @@ class HomePage extends StatelessWidget {
               padding: EdgeInsets.all(16),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   // Vérifier si l'utilisateur est connecté avant d'afficher le bouton de suppression de compte
                   if (FirebaseAuth.instance.currentUser != null)
-                    FloatingActionButton(
-                      heroTag: 'deleteAccount',
-                      onPressed: () {
-                        deleteAccount(context);
-                      },
-                      child: Icon(Icons.delete),
-                    ),
-                  FloatingActionButton(
-                    heroTag: 'postform',
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PostForm(),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text('Supprimer le compte'),
+                        SizedBox(
+                            width: 8), // Espacement entre le texte et le bouton
+                        FloatingActionButton(
+                          heroTag: 'deleteAccount',
+                          onPressed: () {
+                            deleteAccount(context);
+                          },
+                          child: Icon(Icons.delete),
+                          backgroundColor: Colors.red,
                         ),
-                      );
-                    },
-                    child: Icon(Icons.add),
+                      ],
+                    ),
+
+                  SizedBox(height: 8), // Espacement entre les boutons
+
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('Ajouter un post'),
+                      SizedBox(
+                          width: 8), // Espacement entre le texte et le bouton
+                      FloatingActionButton(
+                        heroTag: 'postform',
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PostForm(),
+                            ),
+                          );
+                        },
+                        child: Icon(Icons.add),
+                      ),
+                    ],
                   ),
-                  FloatingActionButton(
-                    heroTag: 'logout',
-                    onPressed: () {
-                      FirebaseAuth.instance.currentUser != null
-                          ? FirebaseAuth.instance.signOut()
-                          : Navigator.push(
+
+                  SizedBox(height: 8), // Espacement entre les boutons
+
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(FirebaseAuth.instance.currentUser != null
+                          ? 'Se déconnecter'
+                          : 'Se connecter'),
+                      SizedBox(
+                          width: 8), // Espacement entre le texte et le bouton
+                      FloatingActionButton(
+                        heroTag: 'logout',
+                        onPressed: () async {
+                          if (FirebaseAuth.instance.currentUser != null) {
+                            await FirebaseAuth.instance.signOut();
+                            Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
                                   builder: (context) => LoginPage()),
                             );
-                    },
-                    child: Icon(
-                      FirebaseAuth.instance.currentUser != null
-                          ? Icons.logout
-                          : Icons.login,
-                    ),
+                          } else {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => LoginPage()),
+                            );
+                          }
+                        },
+                        child: Icon(
+                          FirebaseAuth.instance.currentUser != null
+                              ? Icons.logout
+                              : Icons.login,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
