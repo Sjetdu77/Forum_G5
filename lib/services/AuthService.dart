@@ -59,7 +59,7 @@ class AuthService {
       return user;
     } catch (error) {
       print(error.toString());
-      return null;
+      return "";
     }
   }
 
