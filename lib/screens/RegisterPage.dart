@@ -13,13 +13,13 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPageState extends State<RegisterPage> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
-  TextEditingController _usernameController =
-      TextEditingController(); // Nouveau contrôleur pour le nom d'utilisateur
+  TextEditingController _usernameController = TextEditingController();
   String _errorMessage = '';
   String _successMessage = '';
+  bool _isRegistering =
+      false; // Ajouter cet état pour suivre si l'inscription est en cours
 
-  final AuthService _authService =
-      AuthService(); // Créer une instance de AuthService
+  final AuthService _authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
@@ -43,15 +43,17 @@ class _RegisterPageState extends State<RegisterPage> {
                 obscureText: true,
               ),
               TextField(
-                controller:
-                    _usernameController, // Champ de saisie pour le nom d'utilisateur
+                controller: _usernameController,
                 decoration: InputDecoration(labelText: 'Username'),
               ),
               SizedBox(height: 16),
               ElevatedButton(
-                onPressed: () {
-                  _register();
-                },
+                onPressed: _isRegistering
+                    ? null
+                    : () {
+                        // Désactiver le bouton pendant l'inscription
+                        _register();
+                      },
                 child: Text('Register'),
               ),
               SizedBox(height: 16),
@@ -91,6 +93,11 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   void _register() async {
+    setState(() {
+      _isRegistering = true; // Définir l'état d'inscription comme vrai
+      _successMessage = ''; // Réinitialiser le message de réussite
+    });
+
     try {
       User? user = await _authService.registerWithEmailAndPassword(
         _emailController.text,
@@ -103,12 +110,14 @@ class _RegisterPageState extends State<RegisterPage> {
         setState(() {
           _errorMessage = '';
           _successMessage = 'Inscription réussie !';
+          _isRegistering = false; // Définir l'état d'inscription comme faux
         });
       } else {
         // Erreur lors de l'enregistrement
         setState(() {
           _errorMessage = 'Erreur lors de l\'inscription. Veuillez réessayer.';
           _successMessage = '';
+          _isRegistering = false; // Définir l'état d'inscription comme faux
         });
       }
     } catch (e) {
@@ -117,6 +126,7 @@ class _RegisterPageState extends State<RegisterPage> {
         _errorMessage =
             'Erreur lors de l\'inscription: $e. Veuillez réessayer.';
         _successMessage = '';
+        _isRegistering = false; // Définir l'état d'inscription comme faux
       });
     }
   }

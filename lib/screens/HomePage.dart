@@ -64,7 +64,16 @@ class HomePage extends StatelessWidget {
         await post.reference.delete();
       }
 
-      // 1. Supprimer les commentaires de l'utilisateur (si stockés séparément)
+      // 1.1 Supprimer les commentaires de l'utilisateur dans les posts d'autres utilisateurs
+      final QuerySnapshot allPosts = await firestore.collection('posts').get();
+      for (final post in allPosts.docs) {
+        List<dynamic> comments = post['messageList'] ?? <dynamic>[];
+        comments =
+            comments.where((comment) => comment['author'] != userId).toList();
+        await post.reference.update({'messageList': comments});
+      }
+
+      // 2. Supprimer les commentaires de l'utilisateur (si stockés séparément)
       final QuerySnapshot userComments = await firestore
           .collection('comments')
           .where('author', isEqualTo: userId)
@@ -73,10 +82,10 @@ class HomePage extends StatelessWidget {
         await comment.reference.delete();
       }
 
-      // 2. Supprimer l'utilisateur dans Firestore (si vous stockez des données de profil séparées)
+      // 3. Supprimer l'utilisateur dans Firestore (si vous stockez des données de profil séparées)
       await firestore.collection('users').doc(userId).delete();
 
-      // 3. Supprimer le compte utilisateur dans Firebase Authentication
+      // 4. Supprimer le compte utilisateur dans Firebase Authentication
       await currentUser.delete().catchError((error) {
         // Gérer les erreurs (par exemple, si l'utilisateur doit se reconnecter)
         print("Erreur lors de la suppression du compte: $error");
@@ -94,7 +103,8 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Home'),
+        title: Text("Post App"),
+        automaticallyImplyLeading: false,
       ),
       body: Stack(
         children: [
@@ -105,7 +115,7 @@ class HomePage extends StatelessWidget {
               builder: (BuildContext context,
                   AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (snapshot.hasError) {
-                  return Text("Something went wrong");
+                  return Text("Quelque chose s'est pas passé");
                 }
 
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -362,7 +372,7 @@ class HomePage extends StatelessWidget {
                     child: Container(
                       margin: EdgeInsets.all(16),
                       child: Text(
-                        'Logged out',
+                        'Non connecté',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,

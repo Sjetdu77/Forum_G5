@@ -19,13 +19,6 @@ class AuthService {
     }
   }
 
-  Future<void> userSetup(String displayName, email) async {
-    CollectionReference users = FirebaseFirestore.instance.collection('users');
-    FirebaseAuth auth = FirebaseAuth.instance;
-    String uid = auth.currentUser!.uid.toString();
-    users.add({'displayName': displayName, 'id': uid, 'email': email});
-  }
-
   // Register with email & password
   Future registerWithEmailAndPassword(
       String email, String password, String username) async {
@@ -36,20 +29,33 @@ class AuthService {
 
       User? user = FirebaseAuth.instance.currentUser;
 
-      // Mettre à jour le displayName dans Firebase Authentication
-      await user!.updateDisplayName(username);
-      print(user);
-      print('User : ' + user!.uid);
       // Ajouter l'utilisateur à la base de données
-      await Future.delayed(Duration(seconds: 2));
-      await user!.updateDisplayName(username);
       await _firestore.collection('users').doc(user!.uid).set({
         'email': email,
         'displayName': username,
-        'id': user!.uid,
-        // Ajout d'autres champs utilisateur si nécessaire
       });
-      userSetup(username, email);
+
+      // Attendre que le document soit créé avec le bon ID utilisateur
+      bool isDocumentCreated = false;
+      while (!isDocumentCreated) {
+        // Attendre un peu avant de vérifier à nouveau
+        //await Future.delayed(Duration(seconds: 1));
+
+        // Vérifier si le document existe avec le bon ID utilisateur
+        DocumentSnapshot docSnapshot =
+            await _firestore.collection('users').doc(user.uid).get();
+        if (docSnapshot.exists && docSnapshot.id == user.uid) {
+          isDocumentCreated = true;
+        }
+      }
+
+      // Maintenant que le document est créé, mettre à jour le displayName et stocker l'ID
+      await user.updateDisplayName(username);
+      await _firestore
+          .collection('users')
+          .doc(user.uid)
+          .update({'id': user.uid, 'displayName': username});
+
       return user;
     } catch (error) {
       print(error.toString());
