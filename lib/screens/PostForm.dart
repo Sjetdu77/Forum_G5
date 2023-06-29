@@ -17,6 +17,7 @@ class _PostFormState extends State<PostForm> {
   TextEditingController _contentController = TextEditingController();
   String _errorMessage = '';
   String _successMessage = '';
+  bool _isSubmitting = false; // Ajouter cette variable d'état
 
   @override
   Widget build(BuildContext context) {
@@ -37,10 +38,16 @@ class _PostFormState extends State<PostForm> {
               ),
               SizedBox(height: 16),
               ElevatedButton(
-                onPressed: () {
-                  _post();
-                },
-                child: Text('Poster'),
+                onPressed: _isSubmitting
+                    ? null
+                    : () {
+                        // Désactiver le bouton pendant la soumission
+                        _post();
+                      },
+                child: _isSubmitting
+                    ? CircularProgressIndicator()
+                    : Text(
+                        'Poster'), // Afficher un indicateur de chargement pendant la soumission
               ),
               SizedBox(height: 16),
               Text(
@@ -62,11 +69,16 @@ class _PostFormState extends State<PostForm> {
   }
 
   void _post() async {
+    setState(() {
+      _isSubmitting = true; // Indiquer que la soumission est en cours
+    });
+
     User? user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       setState(() {
         _errorMessage = 'Vous devez être connecté pour poster.';
         _successMessage = '';
+        _isSubmitting = false; // Réinitialiser l'état de soumission
       });
       return;
     }
@@ -75,13 +87,13 @@ class _PostFormState extends State<PostForm> {
       setState(() {
         _errorMessage = 'Le contenu ne peut pas être vide.';
         _successMessage = '';
+        _isSubmitting = false; // Réinitialiser l'état de soumission
       });
       return;
     }
 
     try {
       if (widget.postId == null) {
-        // Création d'un nouveau post principal
         Map<String, dynamic> postData = {
           'author': user.uid,
           'authorName': user.displayName,
@@ -93,7 +105,6 @@ class _PostFormState extends State<PostForm> {
         await FirebaseFirestore.instance.collection('posts').add(postData);
         _successMessage = 'Post créé avec succès!';
       } else {
-        // Ajout d'un commentaire à un post principal existant
         Map<String, dynamic> commentData = {
           'author': user.uid,
           'authorName': user.displayName,
@@ -116,8 +127,13 @@ class _PostFormState extends State<PostForm> {
       print('Erreur lors de la création du post: $e');
       setState(() {
         _errorMessage =
-            'Erreur lors de la création dupost. Veuillez réessayer.';
+            'Erreur lors de la création du post. Veuillez réessayer.';
         _successMessage = '';
+      });
+    } finally {
+      setState(() {
+        _isSubmitting =
+            false; // Réinitialiser l'état de soumission après la fin de la requête
       });
     }
   }
