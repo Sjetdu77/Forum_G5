@@ -1,5 +1,3 @@
-// ignore_for_file: file_names
-
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -7,7 +5,6 @@ import '../services/dataBaseServices.dart';
 import 'PostForm.dart';
 import 'LoginPage.dart';
 
-// ignore: use_key_in_widget_constructors
 class HomePage extends StatelessWidget {
   final DataBaseServices _dataBaseServices = DataBaseServices();
 
@@ -22,8 +19,7 @@ class HomePage extends StatelessWidget {
         children: [
           Center(
             child: StreamBuilder<QuerySnapshot>(
-              stream: _dataBaseServices
-                  .getPosts(), // Utilisez la méthode du service
+              stream: _dataBaseServices.getPosts(),
               builder: (BuildContext context,
                   AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (snapshot.hasError) {
@@ -60,14 +56,40 @@ class HomePage extends StatelessWidget {
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              // Afficher la date du post
+                              if (data['datePosting'] != null)
+                                Text(
+                                  formatDate(data['datePosting'].toDate()),
+                                  style: TextStyle(
+                                      fontSize: 10, color: Colors.grey),
+                                ),
+                              SizedBox(height: 8),
                               Text(data['content'] ?? ''),
+
                               ListView.builder(
                                 shrinkWrap: true,
                                 itemCount: comments.length,
                                 itemBuilder: (context, index) {
                                   var comment = comments[index];
                                   return ListTile(
-                                    title: Text(comment['authorName'] ?? ''),
+                                    title: Row(
+                                      children: [
+                                        Text(comment['authorName'] ?? '',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold)),
+                                        SizedBox(
+                                            width:
+                                                8), // Espace entre le nom de l'auteur et la date
+                                        if (comment['datePosting'] != null)
+                                          Text(
+                                            formatDate(comment['datePosting']
+                                                .toDate()),
+                                            style: TextStyle(
+                                                fontSize: 10,
+                                                color: Colors.grey),
+                                          ),
+                                      ],
+                                    ),
                                     subtitle: Text(comment['content'] ?? ''),
                                     trailing: FirebaseAuth
                                                 .instance.currentUser?.uid ==
@@ -85,6 +107,7 @@ class HomePage extends StatelessWidget {
                                   );
                                 },
                               ),
+
                               Row(
                                 children: [
                                   InkWell(
@@ -142,7 +165,6 @@ class HomePage extends StatelessWidget {
                                   ? IconButton(
                                       icon: Icon(Icons.delete),
                                       onPressed: () {
-                                        // Utilisez le service pour supprimer le post
                                         _dataBaseServices
                                             .deletePost(document.id);
                                       },
@@ -171,8 +193,7 @@ class HomePage extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text('Supprimer le compte'),
-                        SizedBox(
-                            width: 8), // Espacement entre le texte et le bouton
+                        SizedBox(width: 8),
                         FloatingActionButton(
                           heroTag: 'deleteAccount',
                           onPressed: () {
@@ -183,13 +204,12 @@ class HomePage extends StatelessWidget {
                         ),
                       ],
                     ),
-                  SizedBox(height: 8), // Espacement entre les boutons
+                  SizedBox(height: 8),
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text('Ajouter un post'),
-                      SizedBox(
-                          width: 8), // Espacement entre le texte et le bouton
+                      SizedBox(width: 8),
                       FloatingActionButton(
                         heroTag: 'postform',
                         onPressed: () {
@@ -204,15 +224,14 @@ class HomePage extends StatelessWidget {
                       ),
                     ],
                   ),
-                  SizedBox(height: 8), // Espacement entre les boutons
+                  SizedBox(height: 8),
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(FirebaseAuth.instance.currentUser != null
                           ? 'Se déconnecter'
                           : 'Se connecter'),
-                      SizedBox(
-                          width: 8), // Espacement entre le texte et le bouton
+                      SizedBox(width: 8),
                       FloatingActionButton(
                         heroTag: 'logout',
                         onPressed: () async {
@@ -285,5 +304,10 @@ class HomePage extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  // Fonction pour formater ladate
+  String formatDate(DateTime dateTime) {
+    return "${dateTime.day.toString().padLeft(2, '0')}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.year.toString()} ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}";
   }
 }
