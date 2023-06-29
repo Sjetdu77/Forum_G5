@@ -202,6 +202,15 @@ class DataBaseServices {
         await post.reference.update({'messageList': comments});
       }
 
+      // 1.2 Supprimer les likes de l'utilisateur des posts d'autres utilisateurs
+      for (final post in allPosts.docs) {
+        List<dynamic> likes = post['likes'] ?? <dynamic>[];
+        likes = likes
+            .where((like) => like != userId)
+            .toList(); // Supposer que les likes sont stockés sous forme d'IDs d'utilisateurs
+        await post.reference.update({'likes': likes});
+      }
+
       // 2. Supprimer les commentaires de l'utilisateur (si stockés séparément)
       final QuerySnapshot userComments = await firestore
           .collection('comments')
