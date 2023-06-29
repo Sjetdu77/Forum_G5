@@ -1,12 +1,13 @@
+// ignore_for_file: file_names
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/dataBaseServices.dart';
-import '../services/functionPage.dart';
 import 'PostForm.dart';
-import 'RegisterPage.dart';
 import 'LoginPage.dart';
 
+// ignore: use_key_in_widget_constructors
 class HomePage extends StatelessWidget {
   final DataBaseServices _dataBaseServices = DataBaseServices();
 
@@ -90,7 +91,8 @@ class HomePage extends StatelessWidget {
                                       User? currentUser =
                                           FirebaseAuth.instance.currentUser;
                                       if (currentUser != null) {
-                                        await handleLike(document);
+                                        await _dataBaseServices
+                                            .handleLike(document);
                                       }
                                     },
                                     child: StreamBuilder<User?>(
@@ -100,7 +102,7 @@ class HomePage extends StatelessWidget {
                                           (BuildContext context, snapshot) {
                                         User? currentUser = snapshot.data;
                                         bool isLiked = (document.data() as Map<
-                                                    String, dynamic>)?['likes']
+                                                    String, dynamic>)['likes']
                                                 ?.contains(currentUser?.uid) ??
                                             false;
                                         return Icon(
@@ -115,7 +117,7 @@ class HomePage extends StatelessWidget {
                                   SizedBox(width: 4),
                                   Flexible(
                                     child: Text((document.data() as Map<String,
-                                                dynamic>)?['likes']
+                                                dynamic>)['likes']
                                             ?.length
                                             ?.toString() ??
                                         '0'),
@@ -129,7 +131,8 @@ class HomePage extends StatelessWidget {
                             children: [
                               InkWell(
                                 onTap: () {
-                                  createReply(context, document.id);
+                                  _dataBaseServices.createReply(
+                                      context, document.id);
                                 },
                                 child: Icon(Icons.add),
                               ),
@@ -172,7 +175,7 @@ class HomePage extends StatelessWidget {
                         FloatingActionButton(
                           heroTag: 'deleteAccount',
                           onPressed: () {
-                            deleteAccount(context);
+                            _dataBaseServices.deleteAccount(context);
                           },
                           child: Icon(Icons.delete),
                           backgroundColor: Colors.red,
