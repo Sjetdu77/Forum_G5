@@ -13,6 +13,7 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   String _errorMessage = '';
+  String _successMessage = ''; // Nouvelle variable
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +21,7 @@ class _LoginPageState extends State<LoginPage> {
       child: Scaffold(
         appBar: AppBar(
           title: Text('Login Page'),
+          automaticallyImplyLeading: false,
         ),
         body: Container(
           padding: EdgeInsets.all(16),
@@ -47,6 +49,13 @@ class _LoginPageState extends State<LoginPage> {
                 _errorMessage,
                 style: TextStyle(color: Colors.red),
               ),
+              Visibility(
+                visible: _successMessage.isNotEmpty, // Nouveau
+                child: Text(
+                  _successMessage,
+                  style: TextStyle(color: Colors.green),
+                ),
+              ),
               TextButton(
                 onPressed: () {
                   Navigator.push(
@@ -67,6 +76,12 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _login() async {
+    // Réinitialisez les messages
+    setState(() {
+      _errorMessage = '';
+      _successMessage = '';
+    });
+
     try {
       UserCredential userCredential =
           await FirebaseAuth.instance.signInWithEmailAndPassword(
@@ -75,6 +90,12 @@ class _LoginPageState extends State<LoginPage> {
       );
       print('Utilisateur connecté: ${userCredential.user}');
 
+      // Afficher un message de succès
+      setState(() {
+        _successMessage = 'Connexion réussie !';
+      });
+
+      // Ici, vous pouvez également ajouter un délai avant de rediriger vers la page d'accueil
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomePage()),

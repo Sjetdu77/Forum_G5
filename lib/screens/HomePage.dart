@@ -1,121 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../services/dataBaseServices.dart';
 import '../services/functionPage.dart';
 import 'PostForm.dart';
 import 'RegisterPage.dart';
 import 'LoginPage.dart';
 
 class HomePage extends StatelessWidget {
-  void createReply(BuildContext context, String userId) async {
-    final newComment = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => PostForm(postId: userId)),
-    );
-
-    if (newComment != null) {
-      DocumentReference postRef =
-          FirebaseFirestore.instance.collection('posts').doc(userId);
-
-      postRef.update({
-        'messageList': FieldValue.arrayUnion([newComment])
-      });
-    }
-  }
-
-  Future<void> handleLike(DocumentSnapshot document) async {
-    User? currentUser = FirebaseAuth.instance.currentUser;
-    if (currentUser != null) {
-      DocumentReference postRef =
-          FirebaseFirestore.instance.collection('posts').doc(document.id);
-
-      bool isLiked = document['likes'] != null &&
-          document['likes'].contains(currentUser.uid);
-
-      if (isLiked) {
-        await postRef.update({
-          'likes': FieldValue.arrayRemove([currentUser.uid])
-        });
-      } else {
-        await postRef.update({
-          'likes': FieldValue.arrayUnion([currentUser.uid])
-        });
-      }
-    }
-  }
-
-  Future<void> deleteAccount(BuildContext context) async {
-    // Obtenir l'instance de Firebase Auth et Firestore
-    final FirebaseAuth auth = FirebaseAuth.instance;
-    final FirebaseFirestore firestore = FirebaseFirestore.instance;
-
-    // Obtenir l'utilisateur actuellement connecté
-    final User? currentUser = auth.currentUser;
-
-    if (currentUser != null) {
-      final String userId = currentUser.uid;
-
-      // 1. Supprimer les posts de l'utilisateur
-      final QuerySnapshot userPosts = await firestore
-          .collection('posts')
-          .where('author', isEqualTo: userId)
-          .get();
-      for (final post in userPosts.docs) {
-        await post.reference.delete();
-      }
-
-      // 1.1 Supprimer les commentaires de l'utilisateur dans les posts d'autres utilisateurs
-      final QuerySnapshot allPosts = await firestore.collection('posts').get();
-      for (final post in allPosts.docs) {
-        List<dynamic> comments = post['messageList'] ?? <dynamic>[];
-        comments =
-            comments.where((comment) => comment['author'] != userId).toList();
-        await post.reference.update({'messageList': comments});
-      }
-
-      // 2. Supprimer les commentaires de l'utilisateur (si stockés séparément)
-      final QuerySnapshot userComments = await firestore
-          .collection('comments')
-          .where('author', isEqualTo: userId)
-          .get();
-      for (final comment in userComments.docs) {
-        await comment.reference.delete();
-      }
-
-      // 3. Supprimer l'utilisateur dans Firestore (si vous stockez des données de profil séparées)
-      await firestore.collection('users').doc(userId).delete();
-
-      // 4. Supprimer le compte utilisateur dans Firebase Authentication
-      await currentUser.delete().catchError((error) {
-        // Gérer les erreurs (par exemple, si l'utilisateur doit se reconnecter)
-        print("Erreur lors de la suppression du compte: $error");
-      });
-
-      // Rediriger l'utilisateur vers la page de connexion
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => LoginPage()),
-      );
-    }
-  }
+  final DataBaseServices _dataBaseServices = DataBaseServices();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("Post App"),
-        automaticallyImplyLeading: false,
       ),
       body: Stack(
         children: [
           Center(
             child: StreamBuilder<QuerySnapshot>(
-              stream:
-                  FirebaseFirestore.instance.collection('posts').snapshots(),
+              stream: _dataBaseServices
+                  .getPosts(), // Utilisez la méthode du service
               builder: (BuildContext context,
                   AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (snapshot.hasError) {
-                  return Text("Quelque chose s'est pas passé");
+                  return Text("Quelque chose s'est mal passé");
                 }
 
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -163,18 +73,10 @@ class HomePage extends StatelessWidget {
                                         ? IconButton(
                                             icon: Icon(Icons.delete),
                                             onPressed: () async {
-                                              // Obtenir la référence du document
-                                              DocumentReference postRef =
-                                                  FirebaseFirestore.instance
-                                                      .collection('posts')
-                                                      .doc(document.id);
-
-                                              // Supprimer le commentaire de l'array messageList
-                                              await postRef.update({
-                                                'messageList':
-                                                    FieldValue.arrayRemove(
-                                                        [comment])
-                                              });
+                                              // Utilisez le service pour supprimer le commentaire
+                                              await _dataBaseServices
+                                                  .deleteComment(
+                                                      document.id, comment);
                                             },
                                           )
                                         : null,
@@ -236,10 +138,9 @@ class HomePage extends StatelessWidget {
                                   ? IconButton(
                                       icon: Icon(Icons.delete),
                                       onPressed: () {
-                                        FirebaseFirestore.instance
-                                            .collection('posts')
-                                            .doc(document.id)
-                                            .delete();
+                                        // Utilisez le service pour supprimer le post
+                                        _dataBaseServices
+                                            .deletePost(document.id);
                                       },
                                     )
                                   : Container(),
@@ -253,7 +154,6 @@ class HomePage extends StatelessWidget {
               },
             ),
           ),
-          // Aligner les boutons flottants en bas à droite
           Align(
             alignment: Alignment.bottomRight,
             child: Padding(
@@ -262,7 +162,6 @@ class HomePage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.end,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  // Vérifier si l'utilisateur est connecté avant d'afficher le bouton de suppression de compte
                   if (FirebaseAuth.instance.currentUser != null)
                     Row(
                       mainAxisSize: MainAxisSize.min,
@@ -280,9 +179,7 @@ class HomePage extends StatelessWidget {
                         ),
                       ],
                     ),
-
                   SizedBox(height: 8), // Espacement entre les boutons
-
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -303,9 +200,7 @@ class HomePage extends StatelessWidget {
                       ),
                     ],
                   ),
-
                   SizedBox(height: 8), // Espacement entre les boutons
-
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -344,7 +239,6 @@ class HomePage extends StatelessWidget {
               ),
             ),
           ),
-
           StreamBuilder<User?>(
             stream: FirebaseAuth.instance.authStateChanges(),
             builder: (BuildContext context, snapshot) {

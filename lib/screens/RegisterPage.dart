@@ -107,9 +107,13 @@ class _RegisterPageState extends State<RegisterPage> {
 
       if (user != null) {
         // Utilisateur enregistré avec succès
+        // Se déconnecter après un enregistrement réussi
+        await FirebaseAuth.instance.signOut();
+
         setState(() {
           _errorMessage = '';
-          _successMessage = 'Inscription réussie !';
+          _successMessage =
+              'Inscription réussie ! Vous pouvez maintenant vous connecter.';
           _isRegistering = false; // Définir l'état d'inscription comme faux
         });
       } else {
