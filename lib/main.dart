@@ -1,28 +1,38 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_forum/widget_tree.dart';
 import 'package:firebase_core/firebase_core.dart';
 
+import '/screens/loginPage.dart';
+import '/screens/registerPage.dart';
+import '/screens/HomePage.dart';
 import 'firebase_options.dart';
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+void main() async {
+  // WidgetsFlutterBinding.ensureInitialized();
+  // DartPluginRegistrant.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      title: 'Firebase Authentication',
       theme: ThemeData(
-        primarySwatch: Colors.orange,
+        primarySwatch: Colors.blue,
       ),
-      home: const WidgetTree(),
+      initialRoute: '/',
+      routes: {
+        '/': (context) =>
+            HomePage(), // Définir la route par défaut comme la `HomePage`.
+        '/login': (context) => LoginPage(),
+        '/register': (context) => RegisterPage(),
+      },
     );
   }
 }

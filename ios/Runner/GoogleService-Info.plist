@@ -3,21 +3,21 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>416214302902-vpokjegekerssbsj2e0s84cp6h71avsi.apps.googleusercontent.com</string>
+	<string>823475181285-r91epiv349688bq40cnb5ldhe6lhd97v.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.416214302902-vpokjegekerssbsj2e0s84cp6h71avsi</string>
+	<string>com.googleusercontent.apps.823475181285-r91epiv349688bq40cnb5ldhe6lhd97v</string>
 	<key>API_KEY</key>
-	<string>AIzaSyCXW43HU-u_7EgrkkCOW6w31xjTdLQ_LMs</string>
+	<string>AIzaSyCST9avQ11jhN7K2b1ORhYeh7Ep3WPnStE</string>
 	<key>GCM_SENDER_ID</key>
-	<string>416214302902</string>
+	<string>823475181285</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.example.flutterForum</string>
+	<string>com.example.forumApp</string>
 	<key>PROJECT_ID</key>
-	<string>forumg5</string>
+	<string>forum-app-g5</string>
 	<key>STORAGE_BUCKET</key>
-	<string>forumg5.appspot.com</string>
+	<string>forum-app-g5.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -29,6 +29,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:416214302902:ios:1144628dbcd9be5b82e617</string>
+	<string>1:823475181285:ios:d36c06969488eb42e7260c</string>
 </dict>
 </plist>
