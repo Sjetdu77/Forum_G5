@@ -20,6 +20,9 @@ Les utilisateurs ont la possibilité de supprimer leurs propres posts et comment
 ### 5. Flux de posts
 Les posts sont affichés dans un flux, similaire à la page d'accueil de Reddit ou Twitter. Les utilisateurs peuvent parcourir les posts et interagir avec eux en temps réel.
 
+### 6. Flux de posts
+Les utilisateurs connectés peuvent ajouter un seul like par commentaire en temps réel.
+
 ## Technologies utilisées
 - Flutter pour le développement de l'interface utilisateur.
 - Firebase Auth pour la gestion de l'authentification des utilisateurs.
