@@ -70,7 +70,7 @@ class HomePage extends StatelessWidget {
                 }
 
                 return Container(
-                  width: MediaQuery.of(context).size.width * 0.75,
+                  width: MediaQuery.of(context).size.width * 0.65,
                   margin: EdgeInsets.all(16.0),
                   child: ListView(
                     children:
@@ -219,87 +219,184 @@ class HomePage extends StatelessWidget {
               },
             ),
           ),
-          Align(
-            alignment: Alignment.bottomRight,
-            child: Padding(
-              padding: EdgeInsets.all(16),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  if (FirebaseAuth.instance.currentUser != null)
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text('Supprimer le compte'),
-                        SizedBox(width: 8),
-                        FloatingActionButton(
-                          heroTag: 'deleteAccount',
-                          onPressed: () {
-                            _dataBaseServices.deleteAccount(context);
-                          },
-                          child: Icon(Icons.delete),
-                          backgroundColor: Colors.red,
-                        ),
-                      ],
-                    ),
-                  SizedBox(height: 8),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text('Ajouter un post'),
-                      SizedBox(width: 8),
-                      FloatingActionButton(
-                        heroTag: 'postform',
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => PostForm(),
+          LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+              // Vérifier la largeur de l'écran
+              if (constraints.maxWidth > 971) {
+                return StreamBuilder<User?>(
+                  stream: FirebaseAuth.instance.authStateChanges(),
+                  builder: (BuildContext context, snapshot) {
+                    bool isLoggedIn = snapshot.hasData && snapshot.data != null;
+                    return Align(
+                      alignment: Alignment.bottomRight,
+                      child: Padding(
+                        padding: EdgeInsets.all(16),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Text("Ajouter un post",
+                                    style: TextStyle(fontSize: 14)),
+                                SizedBox(width: 8),
+                                FloatingActionButton(
+                                  heroTag: 'Ajouter un post',
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => PostForm()),
+                                    );
+                                  },
+                                  child: Icon(Icons.add),
+                                ),
+                              ],
                             ),
-                          );
-                        },
-                        child: Icon(Icons.add),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 8),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(FirebaseAuth.instance.currentUser != null
-                          ? 'Se déconnecter'
-                          : 'Se connecter'),
-                      SizedBox(width: 8),
-                      FloatingActionButton(
-                        heroTag: 'logout',
-                        onPressed: () async {
-                          if (FirebaseAuth.instance.currentUser != null) {
-                            await FirebaseAuth.instance.signOut();
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => LoginPage()),
-                            );
-                          } else {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => LoginPage()),
-                            );
-                          }
-                        },
-                        child: Icon(
-                          FirebaseAuth.instance.currentUser != null
-                              ? Icons.logout
-                              : Icons.login,
+                            SizedBox(height: 16),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Text(
+                                    isLoggedIn
+                                        ? "Se déconnecter"
+                                        : "Se connecter",
+                                    style: TextStyle(fontSize: 14)),
+                                SizedBox(width: 8),
+                                FloatingActionButton(
+                                  heroTag: 'Connexion / Deconnexion',
+                                  onPressed: () {
+                                    if (isLoggedIn) {
+                                      FirebaseAuth.instance.signOut();
+                                      Navigator.pushAndRemoveUntil(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  LoginPage()),
+                                          (route) => false);
+                                    } else {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => LoginPage()),
+                                      );
+                                    }
+                                  },
+                                  child: Icon(Icons.exit_to_app),
+                                ),
+                              ],
+                            ),
+                            if (isLoggedIn) ...[
+                              SizedBox(height: 16),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Text("Effacer compte",
+                                      style: TextStyle(fontSize: 14)),
+                                  SizedBox(width: 8),
+                                  FloatingActionButton(
+                                    heroTag: 'Effacer compte',
+                                    onPressed: () {
+                                      _dataBaseServices.deleteAccount(context);
+                                    },
+                                    backgroundColor: Colors.red,
+                                    child: Icon(Icons.delete),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ],
                         ),
                       ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+                    );
+                  },
+                );
+              } else {
+                return StreamBuilder<User?>(
+                  stream: FirebaseAuth.instance.authStateChanges(),
+                  builder: (BuildContext context, snapshot) {
+                    bool isLoggedIn = snapshot.hasData && snapshot.data != null;
+                    return Align(
+                      alignment: Alignment.bottomRight,
+                      child: Padding(
+                        padding: EdgeInsets.all(16),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                SizedBox(width: 8),
+                                FloatingActionButton(
+                                  heroTag: 'addComment',
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => PostForm()),
+                                    );
+                                  },
+                                  child: Icon(Icons.add),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 16),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                SizedBox(width: 8),
+                                FloatingActionButton(
+                                  heroTag: 'Déconnexion',
+                                  onPressed: () {
+                                    if (isLoggedIn) {
+                                      FirebaseAuth.instance.signOut();
+                                      Navigator.pushAndRemoveUntil(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  LoginPage()),
+                                          (route) => false);
+                                    } else {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => LoginPage()),
+                                      );
+                                    }
+                                  },
+                                  child: Icon(Icons.exit_to_app),
+                                ),
+                              ],
+                            ),
+                            if (isLoggedIn) ...[
+                              SizedBox(height: 16),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  SizedBox(width: 8),
+                                  FloatingActionButton(
+                                    heroTag: 'Supprimer compte',
+                                    onPressed: () {
+                                      _dataBaseServices.deleteAccount(context);
+                                    },
+                                    backgroundColor: Colors.red,
+                                    child: Icon(
+                                      Icons.delete,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                );
+              }
+            },
           ),
         ],
       ),
