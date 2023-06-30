@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../services/AuthService.dart';
+import '../services/functionPage.dart';
 import 'loginPage.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -18,61 +19,62 @@ class _RegisterPageState extends State<RegisterPage> {
 
   final AuthService _authService = AuthService();
 
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Register Page'),
-      ),
-      body: Container(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextField(
-              controller: _emailController,
-              decoration: InputDecoration(labelText: 'Email'),
-            ),
-            TextField(
-              controller: _passwordController,
-              decoration: InputDecoration(labelText: 'Password'),
-              obscureText: true,
-            ),
-            TextField(
-              controller: _usernameController,
-              decoration: InputDecoration(labelText: 'Username'),
-            ),
-            SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _isRegistering ? null : _register,
-              child: Text('Register'),
-            ),
-            SizedBox(height: 16),
-            Text(
-              _errorMessage,
-              style: TextStyle(color: Colors.red),
-            ),
-            Visibility(
-              visible: _successMessage.isNotEmpty,
-              child: Text(
-                _successMessage,
-                style: TextStyle(color: Colors.green),
+    return PageWithFloatingButton(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Register Page'),
+        ),
+        body: Container(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextField(
+                controller: _emailController,
+                decoration: InputDecoration(labelText: 'Email'),
               ),
-            ),
-            SizedBox(height: 8),
-            TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => LoginPage()),
-                );
-              },
-              child: Text(
-                'Se connecter',
-                style: TextStyle(color: Colors.blue),
+              TextField(
+                controller: _passwordController,
+                decoration: InputDecoration(labelText: 'Password'),
+                obscureText: true,
               ),
-            ),
-          ],
+              TextField(
+                controller: _usernameController,
+                decoration: InputDecoration(labelText: 'Username'),
+              ),
+              SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: _isRegistering ? null : _register,
+                child: Text('Register'),
+              ),
+              SizedBox(height: 16),
+              Text(
+                _errorMessage,
+                style: TextStyle(color: Colors.red),
+              ),
+              Visibility(
+                visible: _successMessage.isNotEmpty,
+                child: Text(
+                  _successMessage,
+                  style: TextStyle(color: Colors.green),
+                ),
+              ),
+              SizedBox(height: 8),
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoginPage()),
+                  );
+                },
+                child: Text(
+                  'Se connecter',
+                  style: TextStyle(color: Colors.blue),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

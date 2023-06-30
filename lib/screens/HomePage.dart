@@ -14,6 +14,45 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         title: Text("Post App"),
         automaticallyImplyLeading: false,
+        actions: [
+          StreamBuilder<User?>(
+            stream: FirebaseAuth.instance.authStateChanges(),
+            builder: (BuildContext context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              } else {
+                if (snapshot.hasData && snapshot.data != null) {
+                  String userUid = snapshot.data!.displayName ?? "";
+                  return Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    child: Center(
+                      child: Text(
+                        'Connecté: $userUid',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  );
+                } else {
+                  return Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    child: Center(
+                      child: Text(
+                        'Non connecté',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  );
+                }
+              }
+            },
+          ),
+        ],
       ),
       body: Stack(
         children: [
@@ -261,45 +300,6 @@ class HomePage extends StatelessWidget {
                 ],
               ),
             ),
-          ),
-          StreamBuilder<User?>(
-            stream: FirebaseAuth.instance.authStateChanges(),
-            builder: (BuildContext context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
-              } else {
-                if (snapshot.hasData && snapshot.data != null) {
-                  String userUid = snapshot.data!.displayName ?? "";
-                  return Align(
-                    alignment: Alignment.topRight,
-                    child: Container(
-                      margin: EdgeInsets.all(16),
-                      child: Text(
-                        'Connecté: $userUid',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  );
-                } else {
-                  return Align(
-                    alignment: Alignment.topRight,
-                    child: Container(
-                      margin: EdgeInsets.all(16),
-                      child: Text(
-                        'Non connecté',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  );
-                }
-              }
-            },
           ),
         ],
       ),
