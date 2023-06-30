@@ -33,7 +33,7 @@ Les posts sont affichés dans un flux, similaire à la page d'accueil de Reddit 
 5. Exécutez `flutter run` pour lancer l'application sur un émulateur ou un appareil réel.
 
 ## Auteurs
-Maxime Avrillon-Thade
-Sami Hella
+Maxime Avrillon-Thade,
+Sami Hella,
 Andy Frot
 
