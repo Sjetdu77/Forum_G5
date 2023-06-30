@@ -181,60 +181,89 @@ class DataBaseServices {
     // Obtenir l'utilisateur actuellement connecté
     final User? currentUser = auth.currentUser;
 
-    if (currentUser != null) {
-      final String userId = currentUser.uid;
+    // Afficher un pop-up de confirmation
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Supprimer le compte"),
+          content: Text(
+              "Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible."),
+          actions: <Widget>[
+            TextButton(
+              child: Text("Annuler"),
+              onPressed: () {
+                Navigator.of(context).pop(); // Fermer le pop-up
+              },
+            ),
+            TextButton(
+              child: Text("Supprimer"),
+              onPressed: () async {
+                if (currentUser != null) {
+                  final String userId = currentUser.uid;
 
-      // 1. Supprimer les posts de l'utilisateur
-      final QuerySnapshot userPosts = await firestore
-          .collection('posts')
-          .where('author', isEqualTo: userId)
-          .get();
-      for (final post in userPosts.docs) {
-        await post.reference.delete();
-      }
+                  // 1. Supprimer les posts de l'utilisateur
+                  final QuerySnapshot userPosts = await firestore
+                      .collection('posts')
+                      .where('author', isEqualTo: userId)
+                      .get();
+                  for (final post in userPosts.docs) {
+                    await post.reference.delete();
+                  }
 
-      // 1.1 Supprimer les commentaires de l'utilisateur dans les posts d'autres utilisateurs
-      final QuerySnapshot allPosts = await firestore.collection('posts').get();
-      for (final post in allPosts.docs) {
-        List<dynamic> comments = post['messageList'] ?? <dynamic>[];
-        comments =
-            comments.where((comment) => comment['author'] != userId).toList();
-        await post.reference.update({'messageList': comments});
-      }
+                  // 1.1 Supprimer les commentaires de l'utilisateur dans les posts d'autres utilisateurs
+                  final QuerySnapshot allPosts =
+                      await firestore.collection('posts').get();
+                  for (final post in allPosts.docs) {
+                    List<dynamic> comments = post['messageList'] ?? <dynamic>[];
+                    comments = comments
+                        .where((comment) => comment['author'] != userId)
+                        .toList();
+                    await post.reference.update({'messageList': comments});
+                  }
 
-      // 1.2 Supprimer les likes de l'utilisateur des posts d'autres utilisateurs
-      for (final post in allPosts.docs) {
-        List<dynamic> likes = post['likes'] ?? <dynamic>[];
-        likes = likes
-            .where((like) => like != userId)
-            .toList(); // Supposer que les likes sont stockés sous forme d'IDs d'utilisateurs
-        await post.reference.update({'likes': likes});
-      }
+                  // 1.2 Supprimer les likes de l'utilisateur des posts d'autres utilisateurs
+                  for (final post in allPosts.docs) {
+                    List<dynamic> likes = post['likes'] ?? <dynamic>[];
+                    likes = likes
+                        .where((like) => like != userId)
+                        .toList(); // Supposer que les likes sont stockés sous forme d'IDs d'utilisateurs
+                    await post.reference.update({'likes': likes});
+                  }
 
-      // 2. Supprimer les commentaires de l'utilisateur (si stockés séparément)
-      final QuerySnapshot userComments = await firestore
-          .collection('comments')
-          .where('author', isEqualTo: userId)
-          .get();
-      for (final comment in userComments.docs) {
-        await comment.reference.delete();
-      }
+                  // 2. Supprimer les commentaires de l'utilisateur (si stockés séparément)
+                  final QuerySnapshot userComments = await firestore
+                      .collection('comments')
+                      .where('author', isEqualTo: userId)
+                      .get();
+                  for (final comment in userComments.docs) {
+                    await comment.reference.delete();
+                  }
 
-      // 3. Supprimer l'utilisateur dans Firestore (si vous stockez des données de profil séparées)
-      await firestore.collection('users').doc(userId).delete();
+                  // 3. Supprimer l'utilisateur dans Firestore (si vous stockez des données de profil séparées)
+                  await firestore.collection('users').doc(userId).delete();
 
-      // 4. Supprimer le compte utilisateur dans Firebase Authentication
-      await currentUser.delete().catchError((error) {
-        // Gérer les erreurs (par exemple, si l'utilisateur doit se reconnecter)
-        print("Erreur lors de la suppression du compte: $error");
-      });
+                  // 4. Supprimer le compte utilisateur dans Firebase Authentication
+                  await currentUser.delete().catchError((error) {
+                    // Gérer les erreurs (par exemple, si l'utilisateur doit se reconnecter)
+                    print("Erreur lors de la suppression du compte: $error");
+                  });
 
-      // Rediriger l'utilisateur vers la page de connexion
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => LoginPage()),
-      );
-    }
+                  // Fermer le pop-up
+                  Navigator.of(context).pop();
+
+                  // Rediriger l'utilisateur vers la page de connexion
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoginPage()),
+                  );
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void createReply(BuildContext context, String userId) async {
