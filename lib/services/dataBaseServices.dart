@@ -267,15 +267,19 @@ class DataBaseServices {
   }
 
   void createReply(BuildContext context, String userId) async {
+    // Ouvre l'écran de formulaire pour créer un nouveau commentaire
     final newComment = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => PostForm(postId: userId)),
     );
 
+    // Vérifie si un nouveau commentaire a été créé
     if (newComment != null) {
+      // Récupère la référence du document du post dans la collection 'posts'
       DocumentReference postRef =
           FirebaseFirestore.instance.collection('posts').doc(userId);
 
+      // Met à jour le champ 'messageList' du document avec le nouveau commentaire
       postRef.update({
         'messageList': FieldValue.arrayUnion([newComment])
       });
@@ -283,19 +287,27 @@ class DataBaseServices {
   }
 
   Future<void> handleLike(DocumentSnapshot document) async {
+    // Récupère l'utilisateur actuellement connecté
     User? currentUser = FirebaseAuth.instance.currentUser;
+
+    // Vérifie si un utilisateur est connecté
     if (currentUser != null) {
+      // Récupère la référence du document du post dans la collection 'posts'
       DocumentReference postRef =
           FirebaseFirestore.instance.collection('posts').doc(document.id);
 
+      // Vérifie si l'utilisateur a déjà aimé le post
       bool isLiked = document['likes'] != null &&
           document['likes'].contains(currentUser.uid);
 
+      // Effectue l'action en fonction de l'état actuel du like
       if (isLiked) {
+        // Si l'utilisateur a déjà aimé le post, le like est supprimé
         await postRef.update({
           'likes': FieldValue.arrayRemove([currentUser.uid])
         });
       } else {
+        // Si l'utilisateur n'a pas aimé le post, le like est ajouté
         await postRef.update({
           'likes': FieldValue.arrayUnion([currentUser.uid])
         });

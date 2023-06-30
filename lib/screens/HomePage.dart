@@ -5,22 +5,30 @@ import '../services/dataBaseServices.dart';
 import 'PostForm.dart';
 import 'LoginPage.dart';
 
+// Définition d'une classe HomePage qui hérite de StatelessWidget
 class HomePage extends StatelessWidget {
+  // Création d'une instance de DataBaseServices pour interagir avec la base de données
   final DataBaseServices _dataBaseServices = DataBaseServices();
 
+  // Surcharge de la méthode build pour construire l'interface utilisateur de la page d'accueil
   @override
   Widget build(BuildContext context) {
+    // Retourne un widget Scaffold qui fournit la structure de base de l'interface utilisateur
     return Scaffold(
+      // Définit la barre d'application en haut de l'écran
       appBar: AppBar(
         title: Text("Post App"),
         automaticallyImplyLeading: false,
         actions: [
+          // Utilisation de StreamBuilder pour écouter les changements d'état d'authentification
           StreamBuilder<User?>(
             stream: FirebaseAuth.instance.authStateChanges(),
             builder: (BuildContext context, snapshot) {
+              // Affiche une barre de progression circulaire si la connexion est en cours
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return Center(child: CircularProgressIndicator());
               } else {
+                // Affiche le nom de l'utilisateur connecté ou 'Non connecté' si l'utilisateur n'est pas connecté
                 if (snapshot.hasData && snapshot.data != null) {
                   String userUid = snapshot.data!.displayName ?? "";
                   return Padding(
@@ -54,21 +62,24 @@ class HomePage extends StatelessWidget {
           ),
         ],
       ),
+      // Définit le contenu principal de la page d'accueil
       body: Stack(
         children: [
           Center(
             child: StreamBuilder<QuerySnapshot>(
+              // Écoute les changements de données de la collection de posts dans Firestore
               stream: _dataBaseServices.getPosts(),
               builder: (BuildContext context,
                   AsyncSnapshot<QuerySnapshot> snapshot) {
+                // Affiche un message d'erreur si quelque chose ne va pas
                 if (snapshot.hasError) {
                   return Text("Quelque chose s'est mal passé");
                 }
-
+                // Affiche une barre de progression circulaire si les données sont en cours de chargement
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return CircularProgressIndicator();
                 }
-
+                // Construit une liste de posts à partir des données récupérées
                 return Container(
                   width: MediaQuery.of(context).size.width * 0.65,
                   margin: EdgeInsets.all(16.0),
@@ -80,6 +91,7 @@ class HomePage extends StatelessWidget {
                       List<dynamic> comments =
                           data['messageList'] ?? <dynamic>[];
 
+                      // Crée une carte pour chaque post
                       return Card(
                         elevation: 1.0,
                         margin: const EdgeInsets.symmetric(
@@ -95,7 +107,7 @@ class HomePage extends StatelessWidget {
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // Afficher la date du post
+                              // Affiche la date du post
                               if (data['datePosting'] != null)
                                 Text(
                                   formatDate(data['datePosting'].toDate()),
@@ -105,48 +117,64 @@ class HomePage extends StatelessWidget {
                               SizedBox(height: 8),
                               Text(data['content'] ?? ''),
 
-                              ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: comments.length,
-                                itemBuilder: (context, index) {
-                                  var comment = comments[index];
-                                  return ListTile(
-                                    title: Row(
-                                      children: [
-                                        Text(comment['authorName'] ?? '',
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold)),
-                                        SizedBox(
-                                            width:
-                                                8), // Espace entre le nom de l'auteur et la date
-                                        if (comment['datePosting'] != null)
-                                          Text(
-                                            formatDate(comment['datePosting']
-                                                .toDate()),
-                                            style: TextStyle(
-                                                fontSize: 10,
-                                                color: Colors.grey),
-                                          ),
-                                      ],
-                                    ),
-                                    subtitle: Text(comment['content'] ?? ''),
-                                    trailing: FirebaseAuth
-                                                .instance.currentUser?.uid ==
-                                            comment['author']
-                                        ? IconButton(
-                                            icon: Icon(Icons.delete),
-                                            onPressed: () async {
-                                              // Utilisez le service pour supprimer le commentaire
-                                              await _dataBaseServices
-                                                  .deleteComment(
-                                                      document.id, comment);
-                                            },
-                                          )
-                                        : null,
-                                  );
-                                },
-                              ),
+                              // ExpansionTile pour afficher les commentaires
 
+                              if (comments.length > 0)
+                                ExpansionTile(
+                                  title: Text(
+                                    "Voir les commentaires",
+                                    style: TextStyle(fontSize: 14),
+                                  ),
+                                  children: [
+                                    ListView.builder(
+                                      shrinkWrap: true,
+                                      physics: NeverScrollableScrollPhysics(),
+                                      itemCount: comments.length,
+                                      itemBuilder: (context, index) {
+                                        var comment = comments[index];
+                                        return ListTile(
+                                          title: Row(
+                                            children: [
+                                              Text(comment['authorName'] ?? '',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold)),
+                                              SizedBox(width: 8),
+                                              if (comment['datePosting'] !=
+                                                  null)
+                                                Text(
+                                                  formatDate(
+                                                      comment['datePosting']
+                                                          .toDate()),
+                                                  style: TextStyle(
+                                                      fontSize: 10,
+                                                      color: Colors.grey),
+                                                ),
+                                            ],
+                                          ),
+                                          subtitle:
+                                              Text(comment['content'] ?? ''),
+                                          trailing: FirebaseAuth.instance
+                                                      .currentUser?.uid ==
+                                                  comment['author']
+                                              ? IconButton(
+                                                  icon: Icon(Icons.delete),
+                                                  onPressed: () async {
+                                                    // Utilise le service pour supprimer le commentaire
+                                                    await _dataBaseServices
+                                                        .deleteComment(
+                                                            document.id,
+                                                            comment);
+                                                  },
+                                                )
+                                              : null,
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                ),
+
+                              // Bouton J'aime et compteur de j'aime
                               Row(
                                 children: [
                                   InkWell(
@@ -221,12 +249,15 @@ class HomePage extends StatelessWidget {
           ),
           LayoutBuilder(
             builder: (BuildContext context, BoxConstraints constraints) {
-              // Vérifier la largeur de l'écran
+              // Vérifier si la largeur de l'écran est supérieure à 971 pixels
               if (constraints.maxWidth > 971) {
+                // Écouter les changements d'état d'authentification
                 return StreamBuilder<User?>(
                   stream: FirebaseAuth.instance.authStateChanges(),
                   builder: (BuildContext context, snapshot) {
+                    // Vérifier si l'utilisateur est connecté
                     bool isLoggedIn = snapshot.hasData && snapshot.data != null;
+                    // Aligner les éléments en bas à droite
                     return Align(
                       alignment: Alignment.bottomRight,
                       child: Padding(
@@ -238,9 +269,11 @@ class HomePage extends StatelessWidget {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
+                                // Afficher le texte "Ajouter un post"
                                 Text("Ajouter un post",
                                     style: TextStyle(fontSize: 14)),
                                 SizedBox(width: 8),
+                                // Bouton pour naviguer vers le formulaire d'ajout de post
                                 FloatingActionButton(
                                   heroTag: 'Ajouter un post',
                                   onPressed: () {
@@ -258,12 +291,14 @@ class HomePage extends StatelessWidget {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
+                                // Afficher le texte "Se déconnecter" ou "Se connecter" selon l'état de connexion
                                 Text(
                                     isLoggedIn
                                         ? "Se déconnecter"
                                         : "Se connecter",
                                     style: TextStyle(fontSize: 14)),
                                 SizedBox(width: 8),
+                                // Bouton pour se connecter ou se déconnecter
                                 FloatingActionButton(
                                   heroTag: 'Connexion / Deconnexion',
                                   onPressed: () {
@@ -287,14 +322,17 @@ class HomePage extends StatelessWidget {
                                 ),
                               ],
                             ),
+                            // Si l'utilisateur est connecté, afficher l'option de suppression de compte
                             if (isLoggedIn) ...[
                               SizedBox(height: 16),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
+                                  // Afficher le texte "Effacer compte"
                                   Text("Effacer compte",
                                       style: TextStyle(fontSize: 14)),
                                   SizedBox(width: 8),
+                                  // Bouton pour supprimer le compte
                                   FloatingActionButton(
                                     heroTag: 'Effacer compte',
                                     onPressed: () {
@@ -313,6 +351,7 @@ class HomePage extends StatelessWidget {
                   },
                 );
               } else {
+                // Si la largeur de l'écran est inférieure ou égale à 971 pixels, utiliser un layout différent
                 return StreamBuilder<User?>(
                   stream: FirebaseAuth.instance.authStateChanges(),
                   builder: (BuildContext context, snapshot) {
@@ -329,6 +368,7 @@ class HomePage extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 SizedBox(width: 8),
+                                // Bouton pour naviguer vers le formulaire d'ajout de post (version réduite)
                                 FloatingActionButton(
                                   heroTag: 'addComment',
                                   onPressed: () {
@@ -347,6 +387,7 @@ class HomePage extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 SizedBox(width: 8),
+                                // Bouton pour se connecter ou se déconnecter (version réduite)
                                 FloatingActionButton(
                                   heroTag: 'Déconnexion',
                                   onPressed: () {
@@ -370,21 +411,21 @@ class HomePage extends StatelessWidget {
                                 ),
                               ],
                             ),
+                            // Si l'utilisateur est connecté, afficher l'option de suppression de compte (version réduite)
                             if (isLoggedIn) ...[
                               SizedBox(height: 16),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   SizedBox(width: 8),
+                                  // Bouton pour supprimer le compte (version réduite)
                                   FloatingActionButton(
                                     heroTag: 'Supprimer compte',
                                     onPressed: () {
                                       _dataBaseServices.deleteAccount(context);
                                     },
                                     backgroundColor: Colors.red,
-                                    child: Icon(
-                                      Icons.delete,
-                                    ),
+                                    child: Icon(Icons.delete),
                                   ),
                                 ],
                               ),

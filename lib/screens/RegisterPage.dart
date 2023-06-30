@@ -1,24 +1,34 @@
 import 'package:flutter/material.dart';
+// Importation de la bibliothèque FirebaseAuth pour l'authentification
 import 'package:firebase_auth/firebase_auth.dart';
+// Importation du service d'authentification personnalisé
 import '../services/AuthService.dart';
+// Importation d'une page avec des fonctions
 import '../services/functionPage.dart';
+// Importation de la page de connexion
 import 'loginPage.dart';
 
+// Définition de la classe RegisterPage qui est un widget d'état
 class RegisterPage extends StatefulWidget {
   @override
   _RegisterPageState createState() => _RegisterPageState();
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  // Contrôleurs pour les champs de texte email, mot de passe et nom d'utilisateur
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   TextEditingController _usernameController = TextEditingController();
+  // Variables pour stocker les messages d'erreur et de succès
   String _errorMessage = '';
   String _successMessage = '';
+  // Variable pour vérifier si l'enregistrement est en cours
   bool _isRegistering = false;
 
+  // Création d'une instance du service d'authentification
   final AuthService _authService = AuthService();
 
+  // Méthode de construction de l'interface utilisateur
   Widget build(BuildContext context) {
     return PageWithFloatingButton(
       child: Scaffold(
@@ -30,29 +40,37 @@ class _RegisterPageState extends State<RegisterPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              // Champ de texte pour l'email
               TextField(
                 controller: _emailController,
                 decoration: InputDecoration(labelText: 'Email'),
               ),
+              // Champ de texte pour le mot de passe
               TextField(
                 controller: _passwordController,
                 decoration: InputDecoration(labelText: 'Password'),
-                obscureText: true,
+                obscureText: true, // Cache le texte pour la confidentialité
               ),
+              // Champ de texte pour le nom d'utilisateur
               TextField(
                 controller: _usernameController,
                 decoration: InputDecoration(labelText: 'Username'),
               ),
               SizedBox(height: 16),
+              // Bouton d'enregistrement
               ElevatedButton(
-                onPressed: _isRegistering ? null : _register,
+                onPressed: _isRegistering
+                    ? null // Désactive le bouton si l'enregistrement est en cours
+                    : _register,
                 child: Text('Register'),
               ),
               SizedBox(height: 16),
+              // Afficher le message d'erreur s'il y en a un
               Text(
                 _errorMessage,
                 style: TextStyle(color: Colors.red),
               ),
+              // Afficher le message de succès s'il y en a un
               Visibility(
                 visible: _successMessage.isNotEmpty,
                 child: Text(
@@ -61,6 +79,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
               ),
               SizedBox(height: 8),
+              // Lien vers la page de connexion
               TextButton(
                 onPressed: () {
                   Navigator.push(
@@ -80,32 +99,39 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
+  // Méthode pour gérer l'enregistrement de l'utilisateur
   void _register() async {
     String username = _usernameController.text.trim();
 
+    // Vérifier si le nom d'utilisateur est vide
     if (username.isEmpty) {
       setState(() {
-        _errorMessage = 'Le nom d\'utilisateur ne peut pas être vide.';
+        _errorMessage = 'Le nom d\'utilisateurne peut pas être vide.';
         _isRegistering = false;
       });
       return;
     }
 
+    // Définir _isRegistering à true pour indiquer que le processus d'enregistrement a commencé
     setState(() {
       _isRegistering = true;
       _successMessage = '';
     });
 
     try {
+      // Appeler le service d'authentification pour enregistrer l'utilisateur
       User? user = await _authService.registerWithEmailAndPassword(
         _emailController.text,
         _passwordController.text,
         username,
       );
 
+      // Vérifier si l'utilisateur est enregistré avec succès
       if (user != null) {
+        // Déconnexion de l'utilisateur
         await FirebaseAuth.instance.signOut();
 
+        // Mise à jour de l'état avec le message de succès
         setState(() {
           _errorMessage = '';
           _successMessage =
@@ -113,6 +139,7 @@ class _RegisterPageState extends State<RegisterPage> {
           _isRegistering = false;
         });
       } else {
+        // Mise à jour de l'état avec le message d'erreur
         setState(() {
           _errorMessage = 'Erreur lors de l\'inscription. Veuillez réessayer.';
           _successMessage = '';
@@ -120,35 +147,32 @@ class _RegisterPageState extends State<RegisterPage> {
         });
       }
     } catch (e) {
-      print(
-          "Full error message: ${e.toString()}"); // Imprimer le message d'erreur complet
+      // Imprimer le message d'erreur complet
+      print("Full error message: ${e.toString()}");
+
+      // Extraire et gérer les codes d'erreur Firebase spécifiques
       String errorCode;
       String errorMessage;
-
-      // Extraire le code d'erreur si l'exception est une erreur Firebase
       final regex = RegExp(r'\(auth\/([a-zA-Z-]+)\)');
       final match = regex.firstMatch(e.toString());
       if (match != null && match.groupCount >= 1) {
-        errorCode = match.group(1)!; // Utilise le code d'erreur extrait
+        errorCode = match.group(1)!;
       } else {
-        errorCode =
-            'unknown-error'; // Utilise 'unknown-error' si l'erreur ne peut pas être extraite
+        errorCode = 'unknown-error';
       }
-
       errorMessage = getErrorMessageInFrench(errorCode);
 
+      // Mise à jour de l'état avec le message d'erreur
       setState(() {
         _errorMessage = errorMessage;
         _successMessage = '';
-        _isRegistering =
-            false; // Ceci permettra de réactiver le bouton d'inscription
+        _isRegistering = false;
       });
     }
   }
 
-  // Cette fonction convertit les codes d'erreur Firebase en messages d'erreur en français
+  // Fonction pour convertir les codes d'erreur Firebase en messages d'erreur en français
   String getErrorMessageInFrench(String errorCode) {
-    print("coodee " + errorCode);
     switch (errorCode) {
       case 'email-already-in-use':
         return 'L\'adresse e-mail est déjà utilisée par un autre compte.';
