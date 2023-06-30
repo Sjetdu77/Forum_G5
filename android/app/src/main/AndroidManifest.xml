@@ -1,7 +1,6 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.forum_app">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
    <application
-        android:label="forum_app"
+        android:label="flutter_forum"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

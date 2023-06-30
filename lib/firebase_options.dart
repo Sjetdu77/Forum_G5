@@ -49,7 +49,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '416214302902',
     projectId: 'forumg5',
     authDomain: 'forumg5.firebaseapp.com',
-    databaseURL: 'https://forumg5-default-rtdb.europe-west1.firebasedatabase.app',
+    databaseURL:
+        'https://forumg5-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'forumg5.appspot.com',
     measurementId: 'G-WJYJXNSN33',
   );
@@ -59,7 +60,8 @@ class DefaultFirebaseOptions {
     appId: '1:416214302902:android:b116f5af9faa18ea82e617',
     messagingSenderId: '416214302902',
     projectId: 'forumg5',
-    databaseURL: 'https://forumg5-default-rtdb.europe-west1.firebasedatabase.app',
+    databaseURL:
+        'https://forumg5-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'forumg5.appspot.com',
   );
 
@@ -68,9 +70,11 @@ class DefaultFirebaseOptions {
     appId: '1:416214302902:ios:e71de1df61f5c0ba82e617',
     messagingSenderId: '416214302902',
     projectId: 'forumg5',
-    databaseURL: 'https://forumg5-default-rtdb.europe-west1.firebasedatabase.app',
+    databaseURL:
+        'https://forumg5-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'forumg5.appspot.com',
-    iosClientId: '416214302902-h35vh6v9t3hk7h3ijn9g87lpuq6ukml7.apps.googleusercontent.com',
+    iosClientId:
+        '416214302902-h35vh6v9t3hk7h3ijn9g87lpuq6ukml7.apps.googleusercontent.com',
     iosBundleId: 'com.example.forumApp',
   );
 
@@ -79,9 +83,11 @@ class DefaultFirebaseOptions {
     appId: '1:416214302902:ios:e71de1df61f5c0ba82e617',
     messagingSenderId: '416214302902',
     projectId: 'forumg5',
-    databaseURL: 'https://forumg5-default-rtdb.europe-west1.firebasedatabase.app',
+    databaseURL:
+        'https://forumg5-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'forumg5.appspot.com',
-    iosClientId: '416214302902-h35vh6v9t3hk7h3ijn9g87lpuq6ukml7.apps.googleusercontent.com',
+    iosClientId:
+        '416214302902-h35vh6v9t3hk7h3ijn9g87lpuq6ukml7.apps.googleusercontent.com',
     iosBundleId: 'com.example.forumApp',
   );
 }
